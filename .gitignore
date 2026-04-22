@@ -75,3 +75,6 @@ Thumbs.db
 /docs
 .claude
 .copilot
+
+# Firebase — never commit real keys
+src/environments/environment.prod.ts

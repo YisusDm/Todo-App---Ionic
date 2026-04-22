@@ -5,12 +5,12 @@
 export const environment = {
   production: false,
   firebase: {
-    apiKey: 'AIzaSyDEMwsF_example_key_for_development',
-    authDomain: 'todo-app-accenture.firebaseapp.com',
-    projectId: 'todo-app-accenture',
-    storageBucket: 'todo-app-accenture.appspot.com',
-    messagingSenderId: '123456789012',
-    appId: '1:123456789012:web:abcdef1234567890',
+    apiKey: 'AIzaSyCG_1EJTY-F-B_lqt793N10P1-U9DaAcYY',
+    authDomain: 'accenture-todo-app-f77b9.firebaseapp.com',
+    projectId: 'accenture-todo-app-f77b9',
+    storageBucket: 'accenture-todo-app-f77b9.firebasestorage.app',
+    messagingSenderId: '817614340238',
+    appId: '1:817614340238:web:0cec236539cfb0525049df',
   },
 };
 
