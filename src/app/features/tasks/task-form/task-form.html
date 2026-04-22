@@ -1,0 +1,75 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEdit ? 'Editar tarea' : 'Nueva tarea' }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="form.invalid" strong>
+        {{ isEdit ? 'Guardar' : 'Crear' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form">
+    <!-- Title -->
+    <ion-item>
+      <ion-input
+        formControlName="title"
+        label="Título *"
+        labelPlacement="floating"
+        placeholder="¿Qué necesitas hacer?"
+      ></ion-input>
+    </ion-item>
+    <ion-text
+      *ngIf="titleControl.invalid && titleControl.touched"
+      color="danger"
+      class="error-text">
+      <small *ngIf="titleControl.errors?.['required']">
+        El título es requerido
+      </small>
+      <small *ngIf="titleControl.errors?.['minlength']">
+        Mínimo 3 caracteres
+      </small>
+    </ion-text>
+
+    <!-- Description -->
+    <ion-item>
+      <ion-textarea
+        formControlName="description"
+        label="Descripción"
+        labelPlacement="floating"
+        placeholder="Detalles opcionales..."
+        rows="3"
+        autoGrow
+      ></ion-textarea>
+    </ion-item>
+
+    <!-- Category -->
+    <ion-item>
+      <ion-select
+        formControlName="categoryId"
+        label="Categoría"
+        labelPlacement="floating"
+        placeholder="Sin categoría"
+      >
+        <ion-select-option [value]="null">Sin categoría</ion-select-option>
+        <ion-select-option *ngFor="let cat of categories" [value]="cat.id">
+          {{ cat.name }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <!-- Due Date -->
+    <ion-item>
+      <ion-input
+        formControlName="dueDate"
+        label="Fecha límite"
+        labelPlacement="floating"
+        type="date"
+      ></ion-input>
+    </ion-item>
+  </form>
+</ion-content>

@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEdit ? 'Editar categoría' : 'Nueva categoría' }}</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancel()">Cancelar</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" [disabled]="form.invalid" strong>
+        {{ isEdit ? 'Guardar' : 'Crear' }}
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form">
+    <!-- Name -->
+    <ion-item>
+      <ion-input
+        formControlName="name"
+        label="Nombre *"
+        labelPlacement="floating"
+        placeholder="Nombre de la categoría"
+      ></ion-input>
+    </ion-item>
+    <ion-text
+      *ngIf="nameControl.invalid && nameControl.touched"
+      color="danger"
+      class="error-text">
+      <small *ngIf="nameControl.errors?.['required']">
+        El nombre es requerido
+      </small>
+      <small *ngIf="nameControl.errors?.['minlength']">
+        Mínimo 2 caracteres
+      </small>
+    </ion-text>
+
+    <!-- Color picker -->
+    <ion-item lines="none">
+      <ion-label>Color *</ion-label>
+    </ion-item>
+    <div class="color-picker">
+      <button
+        *ngFor="let color of PRESET_COLORS"
+        type="button"
+        [style.background]="color"
+        [class.selected]="form.get('color')?.value === color"
+        (click)="selectColor(color)"
+        class="color-button"
+      ></button>
+    </div>
+  </form>
+</ion-content>

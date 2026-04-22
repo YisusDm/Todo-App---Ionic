@@ -1,0 +1,137 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Mis Tareas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Search bar -->
+  <ion-item lines="none" class="ion-padding">
+    <ion-searchbar
+      [formControl]="searchSubject"
+      placeholder="Buscar tareas..."
+      debounce="300">
+    </ion-searchbar>
+  </ion-item>
+
+  <!-- Category filters (chips) -->
+  <ion-list class="category-filters">
+    <ion-item lines="none">
+      <ion-chip
+        [outline]="selectedCategory !== null"
+        [color]="selectedCategory === null ? 'primary' : ''"
+        (click)="filterByCategory(null)">
+        Todas
+      </ion-chip>
+      <ion-chip
+        *ngFor="let cat of categories$ | async; trackBy: trackByCategoryId"
+        [outline]="selectedCategory !== cat.id"
+        [color]="selectedCategory === cat.id ? 'primary' : ''"
+        (click)="filterByCategory(cat.id)"
+        [style.--background]="cat.color">
+        {{ cat.name }}
+      </ion-chip>
+    </ion-item>
+  </ion-list>
+
+  <!-- State filter (segment) -->
+  <ion-segment
+    [value]="currentFilter"
+    (ionChange)="filterByState($any($event).detail.value)">
+    <ion-segment-button [value]="'all'">
+      <ion-label>Todas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button [value]="'pending'">
+      <ion-label>Pendientes</ion-label>
+    </ion-segment-button>
+    <ion-segment-button [value]="'completed'">
+      <ion-label>Completadas</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="ion-padding">
+    <ion-skeleton-text animated style="height: 56px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="height: 56px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="height: 56px; margin-bottom: 8px;"></ion-skeleton-text>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!(isLoading) && (filteredTasks$ | async)?.length === 0" class="empty-state">
+    <ion-icon name="checkmark-done-outline" size="large"></ion-icon>
+    <p>No hay tareas. ¡Agrega tu primera tarea!</p>
+  </div>
+
+  <!-- Tasks list -->
+  <ion-list *ngIf="!(isLoading) && (filteredTasks$ | async)?.length! > 0">
+    <ion-reorder-group
+      [disabled]="!reorderEnabled"
+      (ionItemReorder)="handleReorder($event)">
+
+      <ion-item-sliding
+        *ngFor="let task of filteredTasks$ | async; trackBy: trackByTaskId"
+        class="task-item">
+
+      <!-- Left swipe action: Toggle complete -->
+      <ion-item-options side="start">
+        <ion-item-option
+          color="success"
+          (click)="toggleComplete(task, slidingItem)"
+          #slidingItem>
+          <ion-icon slot="icon-only" [name]="task.completed ? 'close-circle' : 'checkmark-circle'"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+
+      <!-- Main item -->
+      <ion-item (click)="openTaskModal(task)">
+        <ion-checkbox
+          slot="start"
+          [checked]="task.completed"
+          (click)="$event.stopPropagation()">
+        </ion-checkbox>
+
+        <div class="task-content">
+          <h3 [class.completed-text]="task.completed">{{ task.title }}</h3>
+          <p *ngIf="task.description" class="task-description">{{ task.description }}</p>
+
+          <div class="task-meta">
+            <ion-badge
+              *ngIf="task.categoryId"
+              [style.background]="getCategoryColor(task.categoryId, categories$ | async)">
+              {{ getCategoryName(task.categoryId, categories$ | async) }}
+            </ion-badge>
+            <ion-badge
+              color="danger"
+              *ngIf="isOverdue(task)">
+              Vencida
+            </ion-badge>
+          </div>
+        </div>
+
+        <ion-reorder slot="end" *ngIf="reorderEnabled"></ion-reorder>
+      </ion-item>
+
+      <!-- Right swipe action: Delete -->
+      <ion-item-options side="end">
+        <ion-item-option
+          color="danger"
+          (click)="confirmDelete(task.id, slidingItem)"
+          #slidingItem>
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+    </ion-reorder-group>
+  </ion-list>
+
+  <!-- FAB for adding new task -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openTaskModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

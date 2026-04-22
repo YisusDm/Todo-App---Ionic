@@ -1,0 +1,63 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Categorías</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <!-- Loading state -->
+  <div *ngIf="isLoading" class="ion-padding">
+    <ion-skeleton-text animated style="height: 56px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="height: 56px; margin-bottom: 8px;"></ion-skeleton-text>
+    <ion-skeleton-text animated style="height: 56px;"></ion-skeleton-text>
+  </div>
+
+  <!-- Empty state -->
+  <div *ngIf="!(isLoading) && (categories$ | async)?.length === 0" class="empty-state">
+    <ion-icon name="pricetags-outline" size="large"></ion-icon>
+    <p>No hay categorías. ¡Crea tu primera categoría!</p>
+  </div>
+
+  <!-- Categories list -->
+  <ion-list *ngIf="!(isLoading) && (categories$ | async)?.length! > 0">
+    <ion-item-sliding
+      *ngFor="let category of categories$ | async; trackBy: trackByCategoryId">
+
+      <!-- Left swipe action: Edit -->
+      <ion-item-options side="start">
+        <ion-item-option color="primary" (click)="openCategoryModal(category)">
+          <ion-icon slot="icon-only" name="pencil"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+
+      <!-- Main item -->
+      <ion-item>
+        <ion-icon
+          slot="start"
+          name="square"
+          [style.color]="category.color"
+          size="large">
+        </ion-icon>
+
+        <ion-label class="category-content">
+          <h2>{{ category.name }}</h2>
+          <p>{{ (taskCountMap$ | async)?.[category.id] || 0 }} tarea(s)</p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Right swipe action: Delete -->
+      <ion-item-options side="end">
+        <ion-item-option color="danger" (click)="confirmDelete(category.id)">
+          <ion-icon slot="icon-only" name="trash"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <!-- FAB for adding new category -->
+  <ion-fab slot="fixed" vertical="bottom" horizontal="end">
+    <ion-fab-button (click)="openCategoryModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+</ion-content>

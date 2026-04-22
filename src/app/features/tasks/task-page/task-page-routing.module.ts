@@ -1,17 +1,17 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { CategoryPageComponent } from './category-page/category-page';
 
+import { TaskPageComponent } from './task-page';
 
 const routes: Routes = [
   {
     path: '',
-    component: CategoryPageComponent
-  }
+    component: TaskPageComponent,
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class CategoriesPageRoutingModule {}
+export class TaskPageRoutingModule {}

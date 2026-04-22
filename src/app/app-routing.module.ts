@@ -10,13 +10,13 @@ const routes: Routes = [
   {
     path: 'tasks',
     loadChildren: () =>
-      import('./features/tasks/tasks.module').then(m => m.TasksPageModule),
+      import('./features/tasks/tasks.module').then(m => m.TasksModule),
   },
   {
     path: 'categories',
     loadChildren: () =>
       import('./features/categories/categories.module').then(
-        m => m.CategoriesPageModule
+        m => m.CategoriesModule
       ),
   },
 ];

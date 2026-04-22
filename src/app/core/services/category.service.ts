@@ -26,6 +26,10 @@ export class CategoryService {
     return this.categories$;
   }
 
+  getAll(): Category[] {
+    return this.categoriesSubject.getValue();
+  }
+
   getCategoryById(id: string): Category | undefined {
     return this.categoriesSubject.getValue().find(c => c.id === id);
   }
