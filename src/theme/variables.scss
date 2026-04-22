@@ -1,2 +1,57 @@
 // For information on how to create your own theme, please refer to:
 // https://ionicframework.com/docs/theming/
+
+// ── Ionic color overrides ────────────────────────────────────────────────────
+:root {
+  --ion-color-primary:          #16A34A;
+  --ion-color-primary-rgb:      22, 163, 74;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-shade:    #15803D;
+  --ion-color-primary-tint:     #22C55E;
+
+  --ion-background-color:       #F4F8F5;
+  --ion-background-color-rgb:   244, 248, 245;
+
+  --ion-card-background:        #FFFFFF;
+  --ion-item-background:        #FFFFFF;
+
+  // ── Custom design tokens ─────────────────────────────────────────────────
+  --app-primary:        #16A34A;
+  --app-primary-dark:   #15803D;
+  --app-primary-light:  #22C55E;
+  --app-primary-grad:   linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+
+  --app-bg:             #F4F8F5;
+  --app-card:           #FFFFFF;
+  --app-card-radius:    16px;
+  --app-card-shadow:    0 2px 12px rgba(0, 0, 0, 0.08);
+
+  --app-text-primary:   #0F2419;
+  --app-text-secondary: #6B7D72;
+  --app-text-label:     #9BB0A2;
+  --app-divider:        #E4EDE7;
+
+  --app-success:        #22C55E;
+  --app-danger:         #EF4444;
+  --app-warning:        #F59E0B;
+  --app-info:           #3B82F6;
+}
+
+// ── Dark mode ─────────────────────────────────────────────────────────────────
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ion-background-color:     #0D1F13;
+    --ion-background-color-rgb: 13, 31, 19;
+    --ion-card-background:      #162A1D;
+    --ion-item-background:      #162A1D;
+    --ion-color-dark:           #E8F5EC;
+    --ion-color-medium:         #6B7D72;
+    --ion-color-light:          #1E3526;
+    --ion-color-light-shade:    #253D2D;
+
+    --app-bg:           #0D1F13;
+    --app-card:         #162A1D;
+    --app-text-primary: #E8F5EC;
+    --app-divider:      #1E3526;
+  }
+}

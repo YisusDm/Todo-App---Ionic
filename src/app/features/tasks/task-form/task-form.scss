@@ -1,5 +1,55 @@
-.error-text {
+.form-card {
+  margin: 0 0 14px;
+  border-radius: 14px;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.07);
+
+  ion-card-header {
+    padding-bottom: 0;
+  }
+
+  ion-card-subtitle {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+  }
+
+  ion-card-content {
+    padding-top: 8px;
+  }
+
+  ion-input,
+  ion-textarea {
+    --padding-start: 0;
+    --padding-end: 0;
+  }
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+  }
+}
+
+ion-note {
   display: block;
-  margin: 8px 16px 0;
-  font-size: 0.875rem;
+  margin-top: 6px;
+  font-size: 0.8rem;
+}
+
+// Sticky footer button
+.form-footer ion-toolbar {
+  --background: var(--ion-background-color);
+  padding: 6px 16px 10px;
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.07);
+}
+
+.footer-btn-wrap {
+  padding: 0 4px;
+}
+
+.save-btn {
+  --border-radius: 30px;
+  font-weight: 600;
+  font-size: 1rem;
+  height: 50px;
 }

@@ -25,6 +25,9 @@ import { TaskFormComponent } from '../task-form/task-form';
 export class TaskPageComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
+  // Expose TaskFilter to template
+  readonly TaskFilter = TaskFilter;
+
   tasks$ = this.taskService.getTasks();
   categories$ = this.categoryService.getCategories();
   showTaskStats$ = this.remoteConfigService.showTaskStats$;
@@ -69,6 +72,9 @@ export class TaskPageComponent implements OnInit, OnDestroy {
           break;
         case TaskFilter.COMPLETED:
           result = result.filter(t => t.completed);
+          break;
+        case TaskFilter.OVERDUE:
+          result = result.filter(t => !t.completed && !!t.dueDate && new Date() > new Date(t.dueDate));
           break;
       }
 
@@ -199,6 +205,31 @@ export class TaskPageComponent implements OnInit, OnDestroy {
   isOverdue(task: Task): boolean {
     if (!task.dueDate || task.completed) return false;
     return new Date() > new Date(task.dueDate);
+  }
+
+  getDaysRemaining(task: Task): number | null {
+    if (!task.dueDate || task.completed) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(task.dueDate);
+    due.setHours(0, 0, 0, 0);
+    return Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  isUpcomingDue(task: Task): boolean {
+    const days = this.getDaysRemaining(task);
+    return days !== null && days >= 0 && days <= 3;
+  }
+
+  formatDate(date: Date | undefined): string {
+    if (!date) return '—';
+    return new Date(date).toLocaleDateString('es-CO', { day: '2-digit', month: 'short' });
+  }
+
+  getDaysOpen(task: Task): number {
+    const created = new Date(task.createdAt);
+    const today = new Date();
+    return Math.max(0, Math.floor((today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)));
   }
 
   getCategoryColor(categoryId: string | null, categories: Category[] | null): string {

@@ -1,63 +1,111 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Categorías</ion-title>
+  <ion-toolbar class="main-toolbar">
+    <ion-title class="main-title">Categorías</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Loading state -->
-  <div *ngIf="isLoading" class="ion-padding">
-    <ion-skeleton-text animated style="height: 56px; margin-bottom: 8px;"></ion-skeleton-text>
-    <ion-skeleton-text animated style="height: 56px; margin-bottom: 8px;"></ion-skeleton-text>
-    <ion-skeleton-text animated style="height: 56px;"></ion-skeleton-text>
+
+  <!-- Loading skeleton -->
+  <div *ngIf="isLoading" class="skeleton-list">
+    <div *ngFor="let i of [1,2,3]" class="skeleton-card">
+      <div class="sk-bar"></div>
+      <div class="sk-body">
+        <ion-skeleton-text animated style="width:45%; height:15px; margin-bottom:6px; border-radius:6px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width:65%; height:11px; margin-bottom:12px; border-radius:6px;"></ion-skeleton-text>
+        <div style="display:flex; gap:10px;">
+          <ion-skeleton-text animated style="width:30%; height:30px; border-radius:8px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width:30%; height:30px; border-radius:8px;"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width:30%; height:30px; border-radius:8px;"></ion-skeleton-text>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Empty state -->
-  <div *ngIf="!(isLoading) && (categories$ | async)?.length === 0" class="empty-state">
-    <ion-icon name="pricetags-outline" size="large"></ion-icon>
-    <p>No hay categorías. ¡Crea tu primera categoría!</p>
+  <div *ngIf="!isLoading && (categories$ | async)?.length === 0" class="empty-state">
+    <ion-icon name="folder-open-outline"></ion-icon>
+    <h3>Sin categorías</h3>
+    <p>Crea categorías para organizar mejor tus tareas</p>
+    <ion-button fill="solid" shape="round" (click)="openCategoryModal()">
+      <ion-icon name="add-outline" slot="start"></ion-icon>
+      Crear primera categoría
+    </ion-button>
   </div>
 
-  <!-- Categories list -->
-  <ion-list *ngIf="!(isLoading) && (categories$ | async)?.length! > 0">
-    <ion-item-sliding
-      *ngFor="let category of categories$ | async; trackBy: trackByCategoryId">
+  <!-- Category list -->
+  <div *ngIf="!isLoading && (categories$ | async)?.length! > 0" class="cat-list">
+    <ion-list lines="none">
+      <ion-item-sliding
+        *ngFor="let category of categories$ | async; trackBy: trackByCategoryId"
+        class="cat-slide">
 
-      <!-- Left swipe action: Edit -->
-      <ion-item-options side="start">
-        <ion-item-option color="primary" (click)="openCategoryModal(category)">
-          <ion-icon slot="icon-only" name="pencil"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
+        <ion-item-options side="start">
+          <ion-item-option color="primary" (click)="openCategoryModal(category)">
+            <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
 
-      <!-- Main item -->
-      <ion-item>
-        <ion-icon
-          slot="start"
-          name="square"
-          [style.color]="category.color"
-          size="large">
-        </ion-icon>
+        <ion-item class="cat-item" (click)="openCategoryModal(category)">
+          <!-- Color bar -->
+          <div class="cat-color-bar" slot="start" [style.background]="category.color"></div>
 
-        <ion-label class="category-content">
-          <h2>{{ category.name }}</h2>
-          <p>{{ (taskCountMap$ | async)?.[category.id] || 0 }} tarea(s)</p>
-        </ion-label>
-      </ion-item>
+          <ion-label class="cat-label">
+            <!-- Title -->
+            <h2 class="cat-name">{{ category.name }}</h2>
 
-      <!-- Right swipe action: Delete -->
-      <ion-item-options side="end">
-        <ion-item-option color="danger" (click)="confirmDelete(category.id)">
-          <ion-icon slot="icon-only" name="trash"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
+            <!-- Subtitle: quick count + overdue alert -->
+            <p class="cat-subtitle" *ngIf="(taskStatsMap$ | async) as sm">
+              <span>{{ sm[category.id]?.total || 0 }} tarea(s)</span>
+              <span class="subtitle-sep">·</span>
+              <span class="overdue-hint" *ngIf="(sm[category.id]?.overdue || 0) > 0">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                {{ sm[category.id]?.overdue }} vencida(s)
+              </span>
+              <span *ngIf="!(sm[category.id]?.overdue || 0)" class="ok-hint">
+                <i class="bi bi-check-circle-fill"></i> Al día
+              </span>
+            </p>
 
-  <!-- FAB for adding new category -->
+            <!-- Divider -->
+            <div class="cat-divider"></div>
+
+            <!-- 3-column stats row -->
+            <div class="cat-stats-row" *ngIf="(taskStatsMap$ | async) as sm">
+              <div class="stats-col">
+                <span class="stats-value">{{ sm[category.id]?.total || 0 }}</span>
+                <span class="stats-label">Total</span>
+              </div>
+              <div class="stats-divider"></div>
+              <div class="stats-col">
+                <span class="stats-value pending-val">{{ sm[category.id]?.pending || 0 }}</span>
+                <span class="stats-label">Pendientes</span>
+              </div>
+              <div class="stats-divider"></div>
+              <div class="stats-col">
+                <span class="stats-value done-val">{{ sm[category.id]?.completed || 0 }}</span>
+                <span class="stats-label">Listas</span>
+              </div>
+            </div>
+          </ion-label>
+
+          <ion-icon slot="end" name="chevron-forward-outline" class="cat-chevron"></ion-icon>
+        </ion-item>
+
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="confirmDelete(category.id)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+
+      </ion-item-sliding>
+    </ion-list>
+  </div>
+
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="openCategoryModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
 </ion-content>

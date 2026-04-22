@@ -1,75 +1,98 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>{{ isEdit ? 'Editar tarea' : 'Nueva tarea' }}</ion-title>
     <ion-buttons slot="start">
-      <ion-button (click)="cancel()">Cancelar</ion-button>
-    </ion-buttons>
-    <ion-buttons slot="end">
-      <ion-button (click)="save()" [disabled]="form.invalid" strong>
-        {{ isEdit ? 'Guardar' : 'Crear' }}
+      <ion-button fill="clear" (click)="cancel()">
+        <ion-icon name="close-outline" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
+    <ion-title>{{ isEdit ? 'Editar tarea' : 'Nueva tarea' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
   <form [formGroup]="form">
-    <!-- Title -->
-    <ion-item>
-      <ion-input
-        formControlName="title"
-        label="Título *"
-        labelPlacement="floating"
-        placeholder="¿Qué necesitas hacer?"
-      ></ion-input>
-    </ion-item>
-    <ion-text
-      *ngIf="titleControl.invalid && titleControl.touched"
-      color="danger"
-      class="error-text">
-      <small *ngIf="titleControl.errors?.['required']">
-        El título es requerido
-      </small>
-      <small *ngIf="titleControl.errors?.['minlength']">
-        Mínimo 3 caracteres
-      </small>
-    </ion-text>
 
-    <!-- Description -->
-    <ion-item>
-      <ion-textarea
-        formControlName="description"
-        label="Descripción"
-        labelPlacement="floating"
-        placeholder="Detalles opcionales..."
-        rows="3"
-        autoGrow
-      ></ion-textarea>
-    </ion-item>
+    <!-- Título -->
+    <ion-card class="form-card">
+      <ion-card-header>
+        <ion-card-subtitle>Título *</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-input
+          formControlName="title"
+          placeholder="¿Qué necesitas hacer?"
+          [counter]="true"
+          maxlength="100"
+          clearInput>
+        </ion-input>
+        <ion-note color="danger" *ngIf="titleControl.invalid && titleControl.touched">
+          <span *ngIf="titleControl.errors?.['required']">El título es requerido</span>
+          <span *ngIf="titleControl.errors?.['minlength']">Mínimo 3 caracteres</span>
+        </ion-note>
+      </ion-card-content>
+    </ion-card>
 
-    <!-- Category -->
-    <ion-item>
-      <ion-select
-        formControlName="categoryId"
-        label="Categoría"
-        labelPlacement="floating"
-        placeholder="Sin categoría"
-      >
-        <ion-select-option [value]="null">Sin categoría</ion-select-option>
-        <ion-select-option *ngFor="let cat of categories" [value]="cat.id">
-          {{ cat.name }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+    <!-- Descripción -->
+    <ion-card class="form-card">
+      <ion-card-header>
+        <ion-card-subtitle>Descripción</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-textarea
+          formControlName="description"
+          placeholder="Detalles opcionales..."
+          [counter]="true"
+          maxlength="500"
+          autoGrow
+          rows="3">
+        </ion-textarea>
+      </ion-card-content>
+    </ion-card>
 
-    <!-- Due Date -->
-    <ion-item>
-      <ion-input
-        formControlName="dueDate"
-        label="Fecha límite"
-        labelPlacement="floating"
-        type="date"
-      ></ion-input>
-    </ion-item>
+    <!-- Categoría y Fecha -->
+    <ion-card class="form-card">
+      <ion-card-content>
+        <ion-item lines="full">
+          <ion-icon name="pricetag-outline" slot="start" color="medium"></ion-icon>
+          <ion-select
+            formControlName="categoryId"
+            label="Categoría"
+            labelPlacement="floating"
+            placeholder="Sin categoría">
+            <ion-select-option [value]="null">Sin categoría</ion-select-option>
+            <ion-select-option *ngFor="let cat of categories" [value]="cat.id">
+              {{ cat.name }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
+          <ion-input
+            formControlName="dueDate"
+            label="Fecha límite"
+            labelPlacement="floating"
+            type="date">
+          </ion-input>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
   </form>
 </ion-content>
+
+<ion-footer class="ion-no-border form-footer">
+  <ion-toolbar>
+    <div class="footer-btn-wrap">
+      <ion-button
+        expand="block"
+        shape="round"
+        (click)="save()"
+        [disabled]="form.invalid"
+        class="save-btn">
+        <ion-icon [name]="isEdit ? 'save-outline' : 'add-circle-outline'" slot="start"></ion-icon>
+        {{ isEdit ? 'Guardar cambios' : 'Crear tarea' }}
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>

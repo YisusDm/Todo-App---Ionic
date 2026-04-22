@@ -34,13 +34,19 @@ export class CategoryPageComponent implements OnInit, OnDestroy {
   categories$ = this.categoryService.getCategories();
   tasks$ = this.taskService.getTasks();
 
-  taskCountMap$ = combineLatest([this.tasks$, this.categories$]).pipe(
+  taskStatsMap$ = combineLatest([this.tasks$, this.categories$]).pipe(
     map(([tasks, categories]) => {
-      const map: Record<string, number> = {};
+      const stats: Record<string, { total: number; pending: number; completed: number; overdue: number }> = {};
       categories.forEach(cat => {
-        map[cat.id] = tasks.filter(t => t.categoryId === cat.id).length;
+        const catTasks = tasks.filter(t => t.categoryId === cat.id);
+        stats[cat.id] = {
+          total: catTasks.length,
+          pending: catTasks.filter(t => !t.completed).length,
+          completed: catTasks.filter(t => t.completed).length,
+          overdue: catTasks.filter(t => !t.completed && !!t.dueDate && new Date() > new Date(t.dueDate)).length,
+        };
       });
-      return map;
+      return stats;
     }),
     takeUntil(this.destroy$)
   );

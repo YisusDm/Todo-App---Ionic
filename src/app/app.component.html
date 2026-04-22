@@ -1,15 +1,20 @@
 <ion-app>
+  <!-- Global app bar -->
+  <div class="app-bar">
+    <span class="app-bar-title">To Do App</span>
+  </div>
+
   <ion-router-outlet></ion-router-outlet>
 
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="tasks" href="/tasks">
-      <ion-icon name="checkbox-outline"></ion-icon>
-      <ion-label>Tareas</ion-label>
-    </ion-tab-button>
-
-    <ion-tab-button tab="categories" href="/categories">
-      <ion-icon name="pricetags-outline"></ion-icon>
-      <ion-label>Categorías</ion-label>
-    </ion-tab-button>
-  </ion-tab-bar>
+  <!-- Bottom nav — TarkLoud style, green brand -->
+  <nav class="bottom-nav">
+    <button class="nav-item" [class.active]="activeTab === 'tasks'" (click)="navigateTo('/tasks')">
+      <ion-icon [name]="activeTab === 'tasks' ? 'checkbox' : 'checkbox-outline'"></ion-icon>
+      <span>Tareas</span>
+    </button>
+    <button class="nav-item" [class.active]="activeTab === 'categories'" (click)="navigateTo('/categories')">
+      <ion-icon [name]="activeTab === 'categories' ? 'pricetags' : 'pricetags-outline'"></ion-icon>
+      <span>Categorías</span>
+    </button>
+  </nav>
 </ion-app>
