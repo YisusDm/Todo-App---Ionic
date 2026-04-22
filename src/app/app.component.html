@@ -1,3 +1,15 @@
 <ion-app>
   <ion-router-outlet></ion-router-outlet>
+
+  <ion-tab-bar slot="bottom">
+    <ion-tab-button tab="tasks" href="/tasks">
+      <ion-icon name="checkbox-outline"></ion-icon>
+      <ion-label>Tareas</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="categories" href="/categories">
+      <ion-icon name="pricetags-outline"></ion-icon>
+      <ion-label>Categorías</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
 </ion-app>
