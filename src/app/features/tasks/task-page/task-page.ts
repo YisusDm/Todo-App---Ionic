@@ -12,6 +12,7 @@ import { TaskService } from '../../../core/services/task.service';
 import { CategoryService } from '../../../core/services/category.service';
 import { Task, TaskFilter } from '../../../shared/models/task.model';
 import { Category } from '../../../shared/models/category.model';
+import { RemoteConfigService } from '../../../core/services/remote-config.service';
 import { TaskFormComponent } from '../task-form/task-form';
 
 @Component({
@@ -26,6 +27,20 @@ export class TaskPageComponent implements OnInit, OnDestroy {
 
   tasks$ = this.taskService.getTasks();
   categories$ = this.categoryService.getCategories();
+  showTaskStats$ = this.remoteConfigService.showTaskStats$;
+
+  // Statistics (calculated from tasks$)
+  stats$ = this.tasks$.pipe(
+    map(tasks => ({
+      total: tasks.length,
+      completed: tasks.filter(t => t.completed).length,
+      pending: tasks.filter(t => !t.completed).length,
+      completionPercentage:
+        tasks.length > 0
+          ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100)
+          : 0,
+    }))
+  );
 
   filterSubject = new Subject<TaskFilter>();
   categorySubject = new Subject<string | null>();
@@ -79,6 +94,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
   constructor(
     private taskService: TaskService,
     private categoryService: CategoryService,
+    private remoteConfigService: RemoteConfigService,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController

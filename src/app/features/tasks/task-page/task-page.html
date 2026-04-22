@@ -18,6 +18,29 @@
     </ion-searchbar>
   </ion-item>
 
+  <!-- Statistics panel (controlled by Firebase Remote Config) -->
+  <div *ngIf="showTaskStats$ | async" class="stats-panel ion-padding">
+    <h3>Estadísticas</h3>
+    <div class="stats-grid" *ngIf="stats$ | async as stats">
+      <div class="stat-item">
+        <span class="stat-label">Total</span>
+        <span class="stat-value">{{ stats.total }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Completadas</span>
+        <span class="stat-value" style="color: #10b981;">{{ stats.completed }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Pendientes</span>
+        <span class="stat-value" style="color: #f59e0b;">{{ stats.pending }}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">Avance</span>
+        <span class="stat-value">{{ stats.completionPercentage }}%</span>
+      </div>
+    </div>
+  </div>
+
   <!-- Category filters (chips) -->
   <ion-list class="category-filters">
     <ion-item lines="none">
