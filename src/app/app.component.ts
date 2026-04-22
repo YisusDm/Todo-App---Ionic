@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TaskService } from './core/services/task.service';
 import { CategoryService } from './core/services/category.service';
+import { RemoteConfigService } from './core/services/remote-config.service';
 
 @Component({
   selector: 'app-root',
@@ -11,12 +12,13 @@ import { CategoryService } from './core/services/category.service';
 export class AppComponent implements OnInit {
   constructor(
     private taskService: TaskService,
-    private categoryService: CategoryService
+    private categoryService: CategoryService,
+    private remoteConfigService: RemoteConfigService
   ) {}
 
   async ngOnInit(): Promise<void> {
-    // Initialize storage once at app startup so all pages have data ready
     await this.categoryService.init();
     await this.taskService.init();
+    await this.remoteConfigService.init();
   }
 }

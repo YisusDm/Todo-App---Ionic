@@ -7,11 +7,9 @@ export class RemoteConfigService {
   private showTaskStatsSubject = new BehaviorSubject<boolean>(false);
   showTaskStats$: Observable<boolean> = this.showTaskStatsSubject.asObservable();
 
-  constructor() {
-    this.initializeRemoteConfig();
-  }
+  constructor() {}
 
-  private async initializeRemoteConfig(): Promise<void> {
+  async init(): Promise<void> {
     try {
       const remoteConfig = getRemoteConfig();
 

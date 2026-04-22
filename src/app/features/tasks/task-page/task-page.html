@@ -96,6 +96,7 @@
       (ionItemReorder)="handleReorder($event)">
 
       <ion-item-sliding
+        #slidingItem
         *ngFor="let task of filteredTasks$ | async; trackBy: trackByTaskId"
         class="task-item">
 
@@ -103,8 +104,7 @@
       <ion-item-options side="start">
         <ion-item-option
           color="success"
-          (click)="toggleComplete(task, slidingItem)"
-          #slidingItem>
+          (click)="toggleComplete(task, slidingItem)">
           <ion-icon slot="icon-only" [name]="task.completed ? 'close-circle' : 'checkmark-circle'"></ion-icon>
         </ion-item-option>
       </ion-item-options>
@@ -142,8 +142,7 @@
       <ion-item-options side="end">
         <ion-item-option
           color="danger"
-          (click)="confirmDelete(task.id, slidingItem)"
-          #slidingItem>
+          (click)="confirmDelete(task.id, slidingItem)">
           <ion-icon slot="icon-only" name="trash"></ion-icon>
         </ion-item-option>
       </ion-item-options>
