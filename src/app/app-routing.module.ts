@@ -11,6 +11,14 @@ const routes: Routes = [
     redirectTo: 'home',
     pathMatch: 'full'
   },
+  {
+    path: 'tasks',
+    loadChildren: () => import('./features/tasks/tasks/tasks.module').then( m => m.TasksPageModule)
+  },
+  {
+    path: 'categories',
+    loadChildren: () => import('./features/categories/categories/categories.module').then( m => m.CategoriesPageModule)
+  },
 ];
 
 @NgModule({
