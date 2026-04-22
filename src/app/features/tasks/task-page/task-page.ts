@@ -134,10 +134,10 @@ export class TaskPageComponent implements OnInit, OnDestroy {
       try {
         if (task) {
           await this.taskService.updateTask(result.data.task);
-          await this.showToast('Tarea actualizada ✓', 'success');
+          await this.showToast('Tarea actualizada', 'success');
         } else {
           await this.taskService.addTask(result.data.task);
-          await this.showToast('Tarea creada ✓', 'success');
+          await this.showToast('Tarea creada', 'success');
         }
       } catch (error) {
         await this.showToast('Error al guardar', 'danger');
@@ -150,7 +150,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
       await this.taskService.toggleComplete(task.id);
       slidingItem.close();
       const msg = task.completed ? 'Marcada como pendiente' : 'Marcada como completada';
-      await this.showToast(msg + ' ✓', 'success');
+      await this.showToast(msg, 'success');
     } catch (error) {
       await this.showToast('Error al actualizar', 'danger');
     }
@@ -169,7 +169,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             try {
               await this.taskService.deleteTask(id);
               slidingItem.close();
-              await this.showToast('Tarea eliminada ✓', 'danger');
+              await this.showToast('Tarea eliminada', 'danger');
             } catch (error) {
               await this.showToast('Error al eliminar', 'danger');
             }

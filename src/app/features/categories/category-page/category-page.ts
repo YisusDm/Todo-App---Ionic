@@ -85,10 +85,10 @@ export class CategoryPageComponent implements OnInit, OnDestroy {
       try {
         if (category) {
           await this.categoryService.updateCategory(result.data.category);
-          await this.showToast('Categoría actualizada ✓', 'success');
+          await this.showToast('Categoría actualizada', 'success');
         } else {
           await this.categoryService.addCategory(result.data.category);
-          await this.showToast('Categoría creada ✓', 'success');
+          await this.showToast('Categoría creada', 'success');
         }
       } catch (error) {
         await this.showToast('Error al guardar', 'danger');
@@ -108,7 +108,7 @@ export class CategoryPageComponent implements OnInit, OnDestroy {
           handler: async () => {
             try {
               await this.categoryService.deleteCategory(id);
-              await this.showToast('Categoría eliminada ✓', 'danger');
+              await this.showToast('Categoría eliminada', 'danger');
             } catch (error) {
               await this.showToast('Error al eliminar', 'danger');
             }
