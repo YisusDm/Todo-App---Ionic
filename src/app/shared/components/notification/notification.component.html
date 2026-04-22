@@ -1,0 +1,15 @@
+<div class="notification-overlay" *ngIf="notification$ | async as notification" @notificationAnimation>
+  <div class="notification-modal" [class]="'notification-' + notification.type">
+    <div class="notification-content">
+      <div class="notification-icon">
+        <i [class]="'bi bi-' + notification.icon"></i>
+      </div>
+      <div class="notification-message">
+        <p>{{ notification.message }}</p>
+      </div>
+      <button class="notification-close" (click)="dismiss()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+  </div>
+</div>

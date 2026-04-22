@@ -4,12 +4,13 @@
  */
 import { Component, ChangeDetectionStrategy, OnInit, OnDestroy,} from '@angular/core';
 import { FormControl } from '@angular/forms';
-import {ModalController, AlertController, ToastController, RefresherCustomEvent,} from '@ionic/angular';
+import {ModalController, AlertController, RefresherCustomEvent,} from '@ionic/angular';
 import { combineLatest, Subject } from 'rxjs';
 import {map,takeUntil,debounceTime,distinctUntilChanged,startWith,} from 'rxjs/operators';
 
 import { TaskService } from '../../../core/services/task.service';
 import { CategoryService } from '../../../core/services/category.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import { Task, TaskFilter } from '../../../shared/models/task.model';
 import { Category } from '../../../shared/models/category.model';
 import { RemoteConfigService } from '../../../core/services/remote-config.service';
@@ -100,10 +101,10 @@ export class TaskPageComponent implements OnInit, OnDestroy {
   constructor(
     private taskService: TaskService,
     private categoryService: CategoryService,
+    private notificationService: NotificationService,
     private remoteConfigService: RemoteConfigService,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
-    private toastCtrl: ToastController
   ) {}
 
   ngOnInit() {
@@ -134,13 +135,13 @@ export class TaskPageComponent implements OnInit, OnDestroy {
       try {
         if (task) {
           await this.taskService.updateTask(result.data.task);
-          await this.showToast('Tarea actualizada', 'success');
+          this.notificationService.show('Tarea actualizada', 'success');
         } else {
           await this.taskService.addTask(result.data.task);
-          await this.showToast('Tarea creada', 'success');
+          this.notificationService.show('Tarea creada', 'success');
         }
       } catch (error) {
-        await this.showToast('Error al guardar', 'danger');
+        this.notificationService.show('Error al guardar', 'danger');
       }
     }
   }
@@ -149,10 +150,13 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     try {
       await this.taskService.toggleComplete(task.id);
       slidingItem.close();
-      const msg = task.completed ? 'Marcada como pendiente' : 'Marcada como completada';
-      await this.showToast(msg, 'success');
+      const isNowComplete = !task.completed;
+      this.notificationService.show(
+        isNowComplete ? 'Marcada como completada' : 'Marcada como pendiente',
+        isNowComplete ? 'success' : 'info'
+      );
     } catch (error) {
-      await this.showToast('Error al actualizar', 'danger');
+      this.notificationService.show('Error al actualizar', 'danger');
     }
   }
 
@@ -169,9 +173,9 @@ export class TaskPageComponent implements OnInit, OnDestroy {
             try {
               await this.taskService.deleteTask(id);
               slidingItem.close();
-              await this.showToast('Tarea eliminada', 'danger');
+              this.notificationService.show('Tarea eliminada', 'danger');
             } catch (error) {
-              await this.showToast('Error al eliminar', 'danger');
+              this.notificationService.show('Error al eliminar', 'danger');
             }
           },
         },
@@ -183,7 +187,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
   async handleRefresh(event: RefresherCustomEvent) {
     await this.taskService.init();
     event.detail.complete();
-    await this.showToast('Actualizado', 'success');
+    this.notificationService.show('Actualizado', 'success');
   }
 
   handleReorder(event: any) {
@@ -191,7 +195,7 @@ export class TaskPageComponent implements OnInit, OnDestroy {
       (this.filteredTasks$ as any).value
     );
     this.taskService.reorderTasks(reordered);
-    this.showToast('Orden actualizado', 'success');
+    this.notificationService.show('Orden actualizado', 'success');
   }
 
   trackByTaskId(_index: number, task: Task): string {
@@ -252,15 +256,5 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     this.selectedCategory = categoryId;
     this.categorySubject.next(categoryId);
     this.reorderEnabled = this.currentFilter === TaskFilter.ALL && !categoryId;
-  }
-
-  private async showToast(message: string, color: 'success' | 'danger') {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000,
-      position: 'bottom',
-      color,
-    });
-    await toast.present();
   }
 }

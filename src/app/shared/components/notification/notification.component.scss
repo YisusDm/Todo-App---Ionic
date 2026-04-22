@@ -1,0 +1,119 @@
+// ── Notification Overlay ──────────────────────────────────────────────────────
+.notification-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  padding: 20px;
+}
+
+// ── Notification Modal ────────────────────────────────────────────────────────
+.notification-modal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 280px;
+  max-width: 420px;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  pointer-events: auto;
+
+  &.notification-success {
+    background: linear-gradient(135deg, #16A34A 0%, #15803D 100%);
+    color: white;
+  }
+
+  &.notification-danger {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+  }
+
+  &.notification-info {
+    background: linear-gradient(135deg, #3B82F6 0%, #1D4ED8 100%);
+    color: white;
+  }
+}
+
+// ── Notification Content ──────────────────────────────────────────────────────
+.notification-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.notification-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.95;
+}
+
+.notification-message {
+  flex: 1;
+  min-width: 0;
+
+  p {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    white-space: normal;
+  }
+}
+
+// ── Notification Close Button ─────────────────────────────────────────────────
+.notification-close {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: inherit;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  padding: 0;
+
+  i {
+    font-size: 16px;
+  }
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.35);
+    transform: scale(1.05);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// ── Responsive ────────────────────────────────────────────────────────────────
+@media (max-width: 480px) {
+  .notification-modal {
+    min-width: auto;
+    max-width: 90vw;
+    padding: 16px;
+  }
+
+  .notification-message p {
+    font-size: 0.9rem;
+  }
+
+  .notification-icon {
+    font-size: 24px;
+  }
+}

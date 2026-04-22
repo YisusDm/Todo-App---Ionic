@@ -11,13 +11,13 @@ import {
 import {
   ModalController,
   AlertController,
-  ToastController,
 } from '@ionic/angular';
 import { combineLatest, Subject } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
 
 import { TaskService } from '../../../core/services/task.service';
 import { CategoryService } from '../../../core/services/category.service';
+import { NotificationService } from '../../../shared/services/notification.service';
 import { Category } from '../../../shared/models/category.model';
 import { CategoryFormComponent } from '../category-form/category-form';
 
@@ -56,9 +56,9 @@ export class CategoryPageComponent implements OnInit, OnDestroy {
   constructor(
     private taskService: TaskService,
     private categoryService: CategoryService,
+    private notificationService: NotificationService,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
-    private toastCtrl: ToastController
   ) {}
 
   ngOnInit() {
@@ -85,13 +85,13 @@ export class CategoryPageComponent implements OnInit, OnDestroy {
       try {
         if (category) {
           await this.categoryService.updateCategory(result.data.category);
-          await this.showToast('Categoría actualizada', 'success');
+          this.notificationService.show('Categoría actualizada', 'success');
         } else {
           await this.categoryService.addCategory(result.data.category);
-          await this.showToast('Categoría creada', 'success');
+          this.notificationService.show('Categoría creada', 'success');
         }
       } catch (error) {
-        await this.showToast('Error al guardar', 'danger');
+        this.notificationService.show('Error al guardar', 'danger');
       }
     }
   }
@@ -108,9 +108,9 @@ export class CategoryPageComponent implements OnInit, OnDestroy {
           handler: async () => {
             try {
               await this.categoryService.deleteCategory(id);
-              await this.showToast('Categoría eliminada', 'danger');
+              this.notificationService.show('Categoría eliminada', 'danger');
             } catch (error) {
-              await this.showToast('Error al eliminar', 'danger');
+              this.notificationService.show('Error al eliminar', 'danger');
             }
           },
         },
@@ -121,15 +121,5 @@ export class CategoryPageComponent implements OnInit, OnDestroy {
 
   trackByCategoryId(_index: number, category: Category): string {
     return category.id;
-  }
-
-  private async showToast(message: string, color: 'success' | 'danger') {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2000,
-      position: 'bottom',
-      color,
-    });
-    await toast.present();
   }
 }
