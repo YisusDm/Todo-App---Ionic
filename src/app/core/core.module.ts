@@ -1,17 +1,14 @@
 import { NgModule, Optional, SkipSelf } from '@angular/core';
-import { IonicStorageModule } from '@ionic/storage-angular';
 import { TASKS_REPOSITORY } from './repositories/tasks.repository';
 import { CATEGORIES_REPOSITORY } from './repositories/categories.repository';
-import { StorageTasksRepository } from './repositories/storage-tasks.repository';
-import { StorageCategoriesRepository } from './repositories/storage-categories.repository';
+import { SqliteTasksRepository } from './repositories/sqlite-tasks.repository';
+import { SqliteCategoriesRepository } from './repositories/sqlite-categories.repository';
 
 // Imported once in AppModule — guards against double import
 @NgModule({
-  imports: [IonicStorageModule.forRoot()],
-  exports: [IonicStorageModule],
   providers: [
-    { provide: TASKS_REPOSITORY, useClass: StorageTasksRepository },
-    { provide: CATEGORIES_REPOSITORY, useClass: StorageCategoriesRepository },
+    { provide: TASKS_REPOSITORY, useClass: SqliteTasksRepository },
+    { provide: CATEGORIES_REPOSITORY, useClass: SqliteCategoriesRepository },
   ],
 })
 export class CoreModule {
