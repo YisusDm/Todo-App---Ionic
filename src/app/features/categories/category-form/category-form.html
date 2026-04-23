@@ -54,13 +54,14 @@
             *ngFor="let color of PRESET_COLORS"
             type="button"
             class="color-btn"
-            [style.background]="color"
-            [class.selected]="form.get('color')?.value === color"
-            (click)="selectColor(color)">
+            [style.background]="color.hex"
+            [class.selected]="form.get('color')?.value === color.hex"
+            (click)="selectColor(color.hex)">
             <ion-icon
-              *ngIf="form.get('color')?.value === color"
+              *ngIf="form.get('color')?.value === color.hex"
               name="checkmark"
-              class="check-icon">
+              class="check-icon"
+              [style.color]="color.checkColor">
             </ion-icon>
           </button>
         </div>
