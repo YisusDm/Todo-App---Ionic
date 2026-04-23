@@ -2,28 +2,27 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Storage } from '@ionic/storage-angular';
 import { Task } from '../../shared/models/task.model';
+import { ITasksRepository } from './tasks.repository';
 
 const STORAGE_KEY = 'tasks';
 
 @Injectable({ providedIn: 'root' })
-export class TaskService {
-  private tasksSubject = new BehaviorSubject<Task[]>([]);
-  tasks$: Observable<Task[]> = this.tasksSubject.asObservable();
+export class StorageTasksRepository implements ITasksRepository {
+  private readonly tasksSubject = new BehaviorSubject<Task[]>([]);
+  private storageReady = false;
 
-  private _storageReady = false;
-
-  constructor(private storage: Storage) {}
-
-  async init(): Promise<void> {
-    if (this._storageReady) return;
-    await this.storage.create();
-    this._storageReady = true;
-    const stored = await this.storage.get(STORAGE_KEY);
-    this.tasksSubject.next(stored ?? []);
-  }
+  constructor(private readonly storage: Storage) {}
 
   getTasks(): Observable<Task[]> {
-    return this.tasks$;
+    return this.tasksSubject.asObservable();
+  }
+
+  async init(): Promise<void> {
+    if (this.storageReady) return;
+    await this.storage.create();
+    this.storageReady = true;
+    const stored = await this.storage.get(STORAGE_KEY);
+    this.tasksSubject.next(stored ?? []);
   }
 
   async addTask(data: Pick<Task, 'title' | 'description' | 'categoryId' | 'dueDate'>): Promise<Task> {
@@ -37,8 +36,7 @@ export class TaskService {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const updated = [...this.tasksSubject.getValue(), task];
-    await this.persist(updated);
+    await this.persist([...this.tasksSubject.getValue(), task]);
     return task;
   }
 
@@ -57,8 +55,7 @@ export class TaskService {
   }
 
   async deleteTask(id: string): Promise<void> {
-    const tasks = this.tasksSubject.getValue().filter(t => t.id !== id);
-    await this.persist(tasks);
+    await this.persist(this.tasksSubject.getValue().filter(t => t.id !== id));
   }
 
   async reorderTasks(tasks: Task[]): Promise<void> {

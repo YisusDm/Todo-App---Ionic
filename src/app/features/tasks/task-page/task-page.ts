@@ -19,9 +19,9 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
 import { TasksFacade } from '../state/tasks.facade';
+import { TaskViewModel } from '../state/tasks.selectors';
 import { NotificationService } from '../../../shared/services/notification.service';
 import { Task, TaskFilter } from '../../../shared/models/task.model';
-import { Category } from '../../../shared/models/category.model';
 import { TaskFormComponent } from '../task-form/task-form';
 
 @Component({
@@ -105,11 +105,11 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  async toggleComplete(task: Task, slidingItem: IonItemSliding): Promise<void> {
+  async toggleComplete(vm: TaskViewModel, slidingItem: IonItemSliding): Promise<void> {
     try {
-      await this.tasksFacade.toggleTaskComplete(task.id);
+      await this.tasksFacade.toggleTaskComplete(vm.task.id);
       await slidingItem.close();
-      const isNowComplete = !task.completed;
+      const isNowComplete = !vm.task.completed;
       this.notificationService.show(
         isNowComplete ? 'Marcada como completada' : 'Marcada como pendiente',
         isNowComplete ? 'success' : 'info'
@@ -154,11 +154,11 @@ export class TaskPageComponent implements OnInit, OnDestroy {
     this.notificationService.show('Orden actualizado', 'success');
   }
 
-  trackByTaskId(_index: number, task: Task): string {
-    return task.id;
+  trackByVmId(_index: number, vm: TaskViewModel): string {
+    return vm.task.id;
   }
 
-  trackByCategoryId(_index: number, category: Category): string {
+  trackByCategoryId(_index: number, category: { id: string }): string {
     return category.id;
   }
 }

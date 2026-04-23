@@ -1,13 +1,16 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
-  getRemoteConfig,
+  RemoteConfig,
   fetchAndActivate,
   getValue,
+  getAll,
 } from '@angular/fire/remote-config';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class RemoteConfigService {
+  private readonly remoteConfig = inject(RemoteConfig);
+
   private readonly showTaskStatsSubject = new BehaviorSubject<boolean>(false);
   readonly showTaskStats$: Observable<boolean> =
     this.showTaskStatsSubject.asObservable();
@@ -44,38 +47,43 @@ export class RemoteConfigService {
    */
   async refresh(): Promise<void> {
     try {
-      const remoteConfig = getRemoteConfig();
-      await fetchAndActivate(remoteConfig);
-      this.applyRemoteValues(remoteConfig);
+      await fetchAndActivate(this.remoteConfig);
+      this.applyRemoteValues();
     } catch (error) {
       console.error('Failed to refresh Remote Config:', error);
     }
   }
 
-  private applyRemoteValues(remoteConfig: ReturnType<typeof getRemoteConfig>): void {
-    const statsValue = getValue(remoteConfig, 'show_task_stats');
+  private applyRemoteValues(): void {
+    const allParams = getAll(this.remoteConfig);
+    const paramsSummary: Record<string, { value: string; source: string }> = {};
+    Object.entries(allParams).forEach(([k, v]) => { paramsSummary[k] = { value: v.asString(), source: v.getSource() }; });
+    console.log('[RemoteConfig] todos los parámetros recibidos:', JSON.stringify(paramsSummary));
+
+    const statsValue = getValue(this.remoteConfig, 'show_task_stats');
     this.showTaskStatsSubject.next(statsValue.asBoolean());
 
-    const categoriesValue = getValue(remoteConfig, 'enable_categories');
+    const categoriesValue = getValue(this.remoteConfig, 'enable_categories');
+    console.log('[RemoteConfig] enable_categories → valor:', categoriesValue.asString(), '| source:', categoriesValue.getSource(), '| boolean:', categoriesValue.asBoolean());
     this.enableCategoriesSubject.next(categoriesValue.asBoolean());
   }
 
   private async loadRemoteConfig(): Promise<void> {
     try {
-      const remoteConfig = getRemoteConfig();
+      this.remoteConfig.settings.minimumFetchIntervalMillis = 0;
+      this.remoteConfig.settings.fetchTimeoutMillis = 60000;
 
-      remoteConfig.settings.minimumFetchIntervalMillis = 0;
-      remoteConfig.settings.fetchTimeoutMillis = 60000;
-
-      remoteConfig.defaultConfig = {
+      this.remoteConfig.defaultConfig = {
         show_task_stats: false,
         enable_categories: false,
       };
 
-      await fetchAndActivate(remoteConfig);
-      this.applyRemoteValues(remoteConfig);
+      console.log('[RemoteConfig] iniciando fetchAndActivate...');
+      const activated = await fetchAndActivate(this.remoteConfig);
+      console.log('[RemoteConfig] fetchAndActivate completado. ¿Nuevos valores activados?', activated);
+      this.applyRemoteValues();
     } catch (error) {
-      console.error('Failed to initialize Remote Config:', error);
+      console.error('[RemoteConfig] ERROR en inicialización:', error);
       this.showTaskStatsSubject.next(false);
       this.enableCategoriesSubject.next(false);
     }

@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { combineLatest, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { TaskService } from '../../../core/services/task.service';
-import { CategoryService } from '../../../core/services/category.service';
+import { ITasksRepository, TASKS_REPOSITORY } from '../../../core/repositories/tasks.repository';
+import { ICategoriesRepository, CATEGORIES_REPOSITORY } from '../../../core/repositories/categories.repository';
 import { Category } from '../../../shared/models/category.model';
 import { Task } from '../../../shared/models/task.model';
 
@@ -16,11 +16,18 @@ export type CategoryTaskStats = {
 
 @Injectable({ providedIn: 'root' })
 export class CategoriesFacade {
-  readonly categories$: Observable<Category[]> = this.categoryService.getCategories();
-  private readonly tasks$: Observable<Task[]> = this.taskService.getTasks();
+  readonly categories$: Observable<Category[]>;
+  private readonly tasks$: Observable<Task[]>;
+  readonly taskStatsMap$: Observable<Record<string, CategoryTaskStats>>;
 
-  readonly taskStatsMap$: Observable<Record<string, CategoryTaskStats>> =
-    combineLatest([this.tasks$, this.categories$]).pipe(
+  constructor(
+    @Inject(TASKS_REPOSITORY) private readonly tasksRepo: ITasksRepository,
+    @Inject(CATEGORIES_REPOSITORY) private readonly categoriesRepo: ICategoriesRepository
+  ) {
+    this.tasks$ = this.tasksRepo.getTasks();
+    this.categories$ = this.categoriesRepo.getCategories();
+
+    this.taskStatsMap$ = combineLatest([this.tasks$, this.categories$]).pipe(
       map(([tasks, categories]) => {
         const stats: Record<string, CategoryTaskStats> = {};
         categories.forEach(cat => {
@@ -37,21 +44,17 @@ export class CategoriesFacade {
         return stats;
       })
     );
-
-  constructor(
-    private readonly taskService: TaskService,
-    private readonly categoryService: CategoryService
-  ) {}
+  }
 
   async addCategory(data: Pick<Category, 'name' | 'color'>): Promise<Category> {
-    return this.categoryService.addCategory(data);
+    return this.categoriesRepo.addCategory(data);
   }
 
   async updateCategory(category: Category): Promise<void> {
-    return this.categoryService.updateCategory(category);
+    return this.categoriesRepo.updateCategory(category);
   }
 
   async deleteCategory(id: string): Promise<void> {
-    return this.categoryService.deleteCategory(id);
+    return this.categoriesRepo.deleteCategory(id);
   }
 }

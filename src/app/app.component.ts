@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
-import { TaskService } from './core/services/task.service';
-import { CategoryService } from './core/services/category.service';
+import { ITasksRepository, TASKS_REPOSITORY } from './core/repositories/tasks.repository';
+import { ICategoriesRepository, CATEGORIES_REPOSITORY } from './core/repositories/categories.repository';
 import { RemoteConfigService } from './core/services/remote-config.service';
 
 @Component({
@@ -16,10 +16,10 @@ export class AppComponent implements OnInit {
   activeTab = 'tasks';
 
   constructor(
-    private taskService: TaskService,
-    private categoryService: CategoryService,
-    private remoteConfigService: RemoteConfigService,
-    private router: Router
+    @Inject(TASKS_REPOSITORY) private readonly tasksRepo: ITasksRepository,
+    @Inject(CATEGORIES_REPOSITORY) private readonly categoriesRepo: ICategoriesRepository,
+    private readonly remoteConfigService: RemoteConfigService,
+    private readonly router: Router
   ) {}
 
   get enableCategories$(): Observable<boolean> {
@@ -27,8 +27,8 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    await this.categoryService.init();
-    await this.taskService.init();
+    await this.categoriesRepo.init();
+    await this.tasksRepo.init();
     await this.remoteConfigService.ensureInitialized();
 
     this.router.events

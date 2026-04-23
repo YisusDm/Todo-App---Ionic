@@ -98,66 +98,66 @@
   </div>
 
   <!-- Empty state -->
-  <div *ngIf="!isLoading && (tasksFacade.filteredTasks$ | async)?.length === 0" class="empty-state">
+  <div *ngIf="!isLoading && (tasksFacade.filteredTasksVm$ | async)?.length === 0" class="empty-state">
     <ion-icon name="checkmark-done-circle-outline"></ion-icon>
     <h3>Sin tareas</h3>
     <p>Toca el <strong>+</strong> para agregar tu primera tarea</p>
   </div>
 
   <!-- Task list -->
-  <div *ngIf="!isLoading && (tasksFacade.filteredTasks$ | async)?.length! > 0" class="task-list">
+  <div *ngIf="!isLoading && (tasksFacade.filteredTasksVm$ | async)?.length! > 0" class="task-list">
     <ion-list lines="none">
       <ion-reorder-group [disabled]="!reorderEnabled" (ionItemReorder)="handleReorder($any($event))">
 
         <ion-item-sliding
           #slidingItem
-          *ngFor="let task of tasksFacade.filteredTasks$ | async; trackBy: trackByTaskId"
+          *ngFor="let vm of tasksFacade.filteredTasksVm$ | async; trackBy: trackByVmId"
           class="task-slide">
 
           <ion-item-options side="start">
             <ion-item-option
-              [color]="task.completed ? 'warning' : 'success'"
-              (click)="toggleComplete(task, slidingItem)">
-              <ion-icon slot="icon-only" [name]="task.completed ? 'refresh-outline' : 'checkmark-outline'"></ion-icon>
+              [color]="vm.task.completed ? 'warning' : 'success'"
+              (click)="toggleComplete(vm, slidingItem)">
+              <ion-icon slot="icon-only" [name]="vm.task.completed ? 'refresh-outline' : 'checkmark-outline'"></ion-icon>
             </ion-item-option>
           </ion-item-options>
 
           <ion-item
             class="task-item"
-            [class.task-completed]="task.completed"
-            [class.task-overdue]="tasksFacade.isOverdue(task)"
-            [class.task-upcoming]="tasksFacade.isUpcomingDue(task)"
-            (click)="openTaskModal(task)">
+            [class.task-completed]="vm.task.completed"
+            [class.task-overdue]="vm.isOverdue"
+            [class.task-upcoming]="vm.isUpcomingDue"
+            (click)="openTaskModal(vm.task)">
 
             <!-- Left color bar -->
             <div
               class="task-color-bar"
               slot="start"
-              [style.background]="tasksFacade.getCategoryColor(task.categoryId, tasksFacade.categories$ | async)">
+              [style.background]="vm.categoryColor">
             </div>
 
             <ion-label class="task-label">
 
               <!-- Title -->
-              <h2 class="task-title" [class.strikethrough]="task.completed">{{ task.title }}</h2>
+              <h2 class="task-title" [class.strikethrough]="vm.task.completed">{{ vm.task.title }}</h2>
 
               <!-- Badges row -->
               <div class="task-badges">
-                <span class="cat-label" *ngIf="task.categoryId">
-                  <span class="cat-dot-sm" [style.background]="tasksFacade.getCategoryColor(task.categoryId, tasksFacade.categories$ | async)"></span>
-                  {{ tasksFacade.getCategoryName(task.categoryId, tasksFacade.categories$ | async) }}
+                <span class="cat-label" *ngIf="vm.task.categoryId">
+                  <span class="cat-dot-sm" [style.background]="vm.categoryColor"></span>
+                  {{ vm.categoryName }}
                 </span>
-                <span class="status-badge" [class.badge-done]="task.completed" [class.badge-pending]="!task.completed">
-                  <i class="bi" [class.bi-check-circle-fill]="task.completed" [class.bi-clock]="!task.completed"></i>
-                  {{ task.completed ? 'Lista' : 'Pendiente' }}
+                <span class="status-badge" [class.badge-done]="vm.task.completed" [class.badge-pending]="!vm.task.completed">
+                  <i class="bi" [class.bi-check-circle-fill]="vm.task.completed" [class.bi-clock]="!vm.task.completed"></i>
+                  {{ vm.task.completed ? 'Lista' : 'Pendiente' }}
                 </span>
-                <span class="priority-badge" *ngIf="tasksFacade.isOverdue(task)">
+                <span class="priority-badge" *ngIf="vm.isOverdue">
                   <i class="bi bi-exclamation-triangle-fill"></i> Alta prioridad
                 </span>
               </div>
 
               <!-- Description -->
-              <p *ngIf="task.description" class="task-desc">{{ task.description }}</p>
+              <p *ngIf="vm.task.description" class="task-desc">{{ vm.task.description }}</p>
 
               <!-- Divider -->
               <div class="task-divider"></div>
@@ -165,20 +165,20 @@
               <!-- 3-column data row -->
               <div class="task-data-row">
                 <div class="data-col">
-                  <span class="data-value" [class.value-danger]="tasksFacade.getDaysOpen(task) > 7">{{ tasksFacade.getDaysOpen(task) }} día(s)</span>
+                  <span class="data-value" [class.value-danger]="vm.daysOpen > 7">{{ vm.daysOpen }} día(s)</span>
                   <span class="data-label">Abierta</span>
                 </div>
                 <div class="data-divider"></div>
                 <div class="data-col">
-                  <span class="data-value">{{ tasksFacade.formatDate(task.createdAt) }}</span>
+                  <span class="data-value">{{ vm.formattedCreatedAt }}</span>
                   <span class="data-label">Creada</span>
                 </div>
                 <div class="data-divider"></div>
                 <div class="data-col">
                   <span class="data-value"
-                    [class.value-danger]="tasksFacade.isOverdue(task)"
-                    [class.value-warning]="tasksFacade.isUpcomingDue(task) && !tasksFacade.isOverdue(task)">
-                    {{ task.dueDate ? tasksFacade.formatDate(task.dueDate) : '—' }}
+                    [class.value-danger]="vm.isOverdue"
+                    [class.value-warning]="vm.isUpcomingDue && !vm.isOverdue">
+                    {{ vm.formattedDueDate }}
                   </span>
                   <span class="data-label">Vence</span>
                 </div>
@@ -190,17 +190,17 @@
             <button
               slot="end"
               class="done-btn"
-              [class.done-btn-active]="task.completed"
-              (click)="toggleComplete(task, slidingItem); $event.stopPropagation()"
-              [attr.aria-label]="task.completed ? 'Marcar pendiente' : 'Marcar como lista'">
-              <ion-icon *ngIf="task.completed" name="checkmark" class="done-check"></ion-icon>
+              [class.done-btn-active]="vm.task.completed"
+              (click)="toggleComplete(vm, slidingItem); $event.stopPropagation()"
+              [attr.aria-label]="vm.task.completed ? 'Marcar pendiente' : 'Marcar como lista'">
+              <ion-icon *ngIf="vm.task.completed" name="checkmark" class="done-check"></ion-icon>
             </button>
 
             <ion-reorder *ngIf="reorderEnabled" slot="end"></ion-reorder>
           </ion-item>
 
           <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="confirmDelete(task.id, slidingItem)">
+            <ion-item-option color="danger" (click)="confirmDelete(vm.task.id, slidingItem)">
               <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
             </ion-item-option>
           </ion-item-options>

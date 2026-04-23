@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ItemReorderEventDetail } from '@ionic/core';
 import { combineLatest, Observable, Subject } from 'rxjs';
@@ -10,11 +10,12 @@ import {
   take,
 } from 'rxjs/operators';
 
-import { TaskService } from '../../../core/services/task.service';
-import { CategoryService } from '../../../core/services/category.service';
+import { ITasksRepository, TASKS_REPOSITORY } from '../../../core/repositories/tasks.repository';
+import { ICategoriesRepository, CATEGORIES_REPOSITORY } from '../../../core/repositories/categories.repository';
 import { RemoteConfigService } from '../../../core/services/remote-config.service';
 import { Task, TaskFilter } from '../../../shared/models/task.model';
 import { Category } from '../../../shared/models/category.model';
+import { buildTaskViewModel, TaskViewModel } from './tasks.selectors';
 
 function normalizeSearchTerm(raw: string | null | undefined): string {
   return (raw ?? '').trim().toLowerCase();
@@ -66,55 +67,69 @@ export class TasksFacade {
 
   readonly searchControl = new FormControl<string>('', { nonNullable: true });
 
-  readonly tasks$: Observable<Task[]> = this.taskService.getTasks();
-  readonly categories$: Observable<Category[]> = this.categoryService.getCategories();
-  readonly showTaskStats$: Observable<boolean> = this.remoteConfigService.showTaskStats$;
-  readonly enableCategories$: Observable<boolean> =
-    this.remoteConfigService.enableCategories$;
-
   private readonly filterSubject = new Subject<TaskFilter>();
   private readonly categorySubject = new Subject<string | null>();
 
-  readonly stats$ = this.tasks$.pipe(
-    map(tasks => ({
-      total: tasks.length,
-      completed: tasks.filter(t => t.completed).length,
-      pending: tasks.filter(t => !t.completed).length,
-      completionPercentage:
-        tasks.length > 0
-          ? Math.round(
-              (tasks.filter(t => t.completed).length / tasks.length) * 100
-            )
-          : 0,
-    }))
-  );
-
-  readonly filteredTasks$ = combineLatest([
-    this.tasks$,
-    this.filterSubject.pipe(startWith(TaskFilter.ALL)),
-    this.categorySubject.pipe(startWith(null)),
-    this.searchControl.valueChanges.pipe(
-      startWith(this.searchControl.value),
-      debounceTime(300),
-      distinctUntilChanged()
-    ),
-  ]).pipe(
-    map(([tasks, filter, categoryId, search]) =>
-      filterTasks(tasks, filter, categoryId, search)
-    )
-  );
+  readonly tasks$: Observable<Task[]>;
+  readonly categories$: Observable<Category[]>;
+  readonly showTaskStats$: Observable<boolean>;
+  readonly enableCategories$: Observable<boolean>;
+  readonly stats$: Observable<{ total: number; completed: number; pending: number; completionPercentage: number }>;
+  readonly filteredTasks$: Observable<Task[]>;
+  readonly filteredTasksVm$: Observable<TaskViewModel[]>;
 
   constructor(
-    private readonly taskService: TaskService,
-    private readonly categoryService: CategoryService,
+    @Inject(TASKS_REPOSITORY) private readonly tasksRepo: ITasksRepository,
+    @Inject(CATEGORIES_REPOSITORY) private readonly categoriesRepo: ICategoriesRepository,
     private readonly remoteConfigService: RemoteConfigService
-  ) {}
+  ) {
+    this.tasks$ = this.tasksRepo.getTasks();
+    this.categories$ = this.categoriesRepo.getCategories();
+    this.showTaskStats$ = this.remoteConfigService.showTaskStats$;
+    this.enableCategories$ = this.remoteConfigService.enableCategories$;
+
+    this.stats$ = this.tasks$.pipe(
+      map(tasks => ({
+        total: tasks.length,
+        completed: tasks.filter(t => t.completed).length,
+        pending: tasks.filter(t => !t.completed).length,
+        completionPercentage:
+          tasks.length > 0
+            ? Math.round((tasks.filter(t => t.completed).length / tasks.length) * 100)
+            : 0,
+      }))
+    );
+
+    this.filteredTasks$ = combineLatest([
+      this.tasks$,
+      this.filterSubject.pipe(startWith(TaskFilter.ALL)),
+      this.categorySubject.pipe(startWith(null)),
+      this.searchControl.valueChanges.pipe(
+        startWith(this.searchControl.value),
+        debounceTime(300),
+        distinctUntilChanged()
+      ),
+    ]).pipe(
+      map(([tasks, filter, categoryId, search]) =>
+        filterTasks(tasks, filter, categoryId, search)
+      )
+    );
+
+    this.filteredTasksVm$ = combineLatest([
+      this.filteredTasks$,
+      this.categories$,
+    ]).pipe(
+      map(([tasks, categories]) =>
+        tasks.map(task => buildTaskViewModel(task, categories))
+      )
+    );
+  }
 
   getCategoriesForTaskForm(): Category[] {
     if (!this.remoteConfigService.areCategoriesEnabled()) {
       return [];
     }
-    return this.categoryService.getAll();
+    return this.categoriesRepo.getAll();
   }
 
   setFilter(filter: TaskFilter): void {
@@ -132,84 +147,28 @@ export class TasksFacade {
   reorderFilteredTasks(event: CustomEvent<ItemReorderEventDetail>): void {
     this.filteredTasks$.pipe(take(1)).subscribe(tasks => {
       const reordered = event.detail.complete(tasks);
-      void this.taskService.reorderTasks(reordered);
+      void this.tasksRepo.reorderTasks(reordered);
     });
   }
 
   async refreshTasks(): Promise<void> {
     await this.remoteConfigService.refresh();
-    await this.taskService.init();
+    await this.tasksRepo.init();
   }
 
-  async addTask(
-    data: Pick<Task, 'title' | 'description' | 'categoryId' | 'dueDate'>
-  ): Promise<Task> {
-    return this.taskService.addTask(data);
+  async addTask(data: Pick<Task, 'title' | 'description' | 'categoryId' | 'dueDate'>): Promise<Task> {
+    return this.tasksRepo.addTask(data);
   }
 
   async updateTask(task: Task): Promise<void> {
-    return this.taskService.updateTask(task);
+    return this.tasksRepo.updateTask(task);
   }
 
   async toggleTaskComplete(id: string): Promise<void> {
-    return this.taskService.toggleComplete(id);
+    return this.tasksRepo.toggleComplete(id);
   }
 
   async deleteTask(id: string): Promise<void> {
-    return this.taskService.deleteTask(id);
-  }
-
-  isOverdue(task: Task): boolean {
-    if (!task.dueDate || task.completed) return false;
-    return new Date() > new Date(task.dueDate);
-  }
-
-  getDaysRemaining(task: Task): number | null {
-    if (!task.dueDate || task.completed) return null;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const due = new Date(task.dueDate);
-    due.setHours(0, 0, 0, 0);
-    return Math.ceil((due.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-  }
-
-  isUpcomingDue(task: Task): boolean {
-    const days = this.getDaysRemaining(task);
-    return days !== null && days >= 0 && days <= 3;
-  }
-
-  formatDate(date: Date | undefined): string {
-    if (!date) return '—';
-    return new Date(date).toLocaleDateString('es-CO', {
-      day: '2-digit',
-      month: 'short',
-    });
-  }
-
-  getDaysOpen(task: Task): number {
-    const created = new Date(task.createdAt);
-    const today = new Date();
-    return Math.max(
-      0,
-      Math.floor(
-        (today.getTime() - created.getTime()) / (1000 * 60 * 60 * 24)
-      )
-    );
-  }
-
-  getCategoryColor(
-    categoryId: string | null,
-    categories: Category[] | null
-  ): string {
-    if (!categoryId || !categories) return '#999999';
-    return categories.find(c => c.id === categoryId)?.color ?? '#999999';
-  }
-
-  getCategoryName(
-    categoryId: string | null,
-    categories: Category[] | null
-  ): string {
-    if (!categoryId || !categories) return '';
-    return categories.find(c => c.id === categoryId)?.name ?? '';
+    return this.tasksRepo.deleteTask(id);
   }
 }

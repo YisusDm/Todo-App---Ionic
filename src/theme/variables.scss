@@ -35,6 +35,12 @@
   --app-danger:         #EF4444;
   --app-warning:        #F59E0B;
   --app-info:           #3B82F6;
+
+  --app-task-completed-bg:  #F9FFF9;
+  --app-task-overdue-bg:    #FFF8F8;
+  --app-task-upcoming-bg:   #FFFEF0;
+  --app-filter-active-bg:   #1A1A2E;
+  --app-filter-active-color: #ffffff;
 }
 
 // ── Dark mode ─────────────────────────────────────────────────────────────────
@@ -53,5 +59,11 @@
     --app-card:         #162A1D;
     --app-text-primary: #E8F5EC;
     --app-divider:      #1E3526;
+
+    --app-task-completed-bg:   #1A3023;
+    --app-task-overdue-bg:     #2A1515;
+    --app-task-upcoming-bg:    #252010;
+    --app-filter-active-bg:    #E8F5EC;
+    --app-filter-active-color: #0D1F13;
   }
 }
