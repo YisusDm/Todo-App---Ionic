@@ -118,8 +118,9 @@ Desde GitHub → pestaña **Releases** → **Draft a new release** → tag `v1.0
 8. [Instalación y configuración](#instalación-y-configuración)
 9. [Ejecución y compilación](#ejecución-y-compilación)
 10. [Estructura del proyecto](#estructura-del-proyecto)
-11. [Control de versiones](#control-de-versiones)
-12. [Desafíos técnicos](#desafíos-técnicos)
+11. [Capturas de pantalla](#-capturas-de-pantalla)
+12. [Control de versiones](#control-de-versiones)
+13. [Desafíos técnicos](#desafíos-técnicos)
 
 ---
 
@@ -643,6 +644,57 @@ todo-app/
 ├── tsconfig.json
 └── package.json
 ```
+
+---
+
+## 📸 Capturas de pantalla
+
+> Capturas tomadas en emulador Chrome DevTools — Pixel 7 (412 × 915 dp)
+
+### Splash screen & Tareas
+
+<table>
+  <tr>
+    <td align="center"><strong>Splash screen</strong></td>
+    <td align="center"><strong>Lista de tareas</strong></td>
+    <td align="center"><strong>Modo oscuro</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/01-splash.png" width="220"/></td>
+    <td><img src="screenshots/02-tasks.png" width="220"/></td>
+    <td><img src="screenshots/03-dark-mode.png" width="220"/></td>
+  </tr>
+</table>
+
+### Formularios & Categorías
+
+<table>
+  <tr>
+    <td align="center"><strong>Nueva tarea</strong></td>
+    <td align="center"><strong>Categorías</strong></td>
+    <td align="center"><strong>Estadísticas</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/04-new-task.png" width="220"/></td>
+    <td><img src="screenshots/05-categories.png" width="220"/></td>
+    <td><img src="screenshots/06-stats.png" width="220"/></td>
+  </tr>
+</table>
+
+### Filtros & Búsqueda
+
+<table>
+  <tr>
+    <td align="center"><strong>Búsqueda en tiempo real</strong></td>
+    <td align="center"><strong>Filtro por estado</strong></td>
+    <td align="center"><strong>Swipe actions</strong></td>
+  </tr>
+  <tr>
+    <td><img src="screenshots/07-search.png" width="220"/></td>
+    <td><img src="screenshots/08-filter.png" width="220"/></td>
+    <td><img src="screenshots/09-swipe.png" width="220"/></td>
+  </tr>
+</table>
 
 ---
 
