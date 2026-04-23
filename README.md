@@ -651,48 +651,44 @@ todo-app/
 
 > Capturas tomadas en emulador Chrome DevTools — Pixel 7 (412 × 915 dp)
 
-### Splash screen & Tareas
+### Vista de tareas
 
 <table>
   <tr>
-    <td align="center"><strong>Splash screen</strong></td>
-    <td align="center"><strong>Lista de tareas</strong></td>
-    <td align="center"><strong>Modo oscuro</strong></td>
+    <td align="center"><strong>Lista de tareas</strong><br/><sub>Stats · Categorías · Filtros</sub></td>
+    <td align="center"><strong>Swipe — Completar</strong><br/><sub>Deslizar derecha</sub></td>
+    <td align="center"><strong>Swipe — Eliminar</strong><br/><sub>Deslizar izquierda</sub></td>
   </tr>
   <tr>
-    <td><img src="screenshots/01-splash.png" width="220"/></td>
-    <td><img src="screenshots/02-tasks.png" width="220"/></td>
-    <td><img src="screenshots/03-dark-mode.png" width="220"/></td>
+    <td><img src="screenshots/01-tasks-list.png" width="220"/></td>
+    <td><img src="screenshots/02-swipe-complete.png" width="220"/></td>
+    <td><img src="screenshots/03-swipe-delete.png" width="220"/></td>
   </tr>
 </table>
 
-### Formularios & Categorías
+### Formularios
 
 <table>
   <tr>
-    <td align="center"><strong>Nueva tarea</strong></td>
-    <td align="center"><strong>Categorías</strong></td>
-    <td align="center"><strong>Estadísticas</strong></td>
+    <td align="center"><strong>Editar tarea</strong><br/><sub>Título · Descripción · Categoría · Fecha</sub></td>
+    <td align="center"><strong>Editar categoría</strong><br/><sub>Nombre · Paleta de colores WCAG</sub></td>
   </tr>
   <tr>
-    <td><img src="screenshots/04-new-task.png" width="220"/></td>
+    <td><img src="screenshots/04-edit-task.png" width="220"/></td>
+    <td><img src="screenshots/06-edit-category.png" width="220"/></td>
+  </tr>
+</table>
+
+### Categorías & Búsqueda
+
+<table>
+  <tr>
+    <td align="center"><strong>Categorías</strong><br/><sub>Contador de tareas · Vencidas</sub></td>
+    <td align="center"><strong>Búsqueda en tiempo real</strong><br/><sub>debounce 300ms · Filtro live</sub></td>
+  </tr>
+  <tr>
     <td><img src="screenshots/05-categories.png" width="220"/></td>
-    <td><img src="screenshots/06-stats.png" width="220"/></td>
-  </tr>
-</table>
-
-### Filtros & Búsqueda
-
-<table>
-  <tr>
-    <td align="center"><strong>Búsqueda en tiempo real</strong></td>
-    <td align="center"><strong>Filtro por estado</strong></td>
-    <td align="center"><strong>Swipe actions</strong></td>
-  </tr>
-  <tr>
     <td><img src="screenshots/07-search.png" width="220"/></td>
-    <td><img src="screenshots/08-filter.png" width="220"/></td>
-    <td><img src="screenshots/09-swipe.png" width="220"/></td>
   </tr>
 </table>
 
