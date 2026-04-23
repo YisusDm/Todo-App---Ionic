@@ -41,29 +41,82 @@
   --app-task-upcoming-bg:   #FFFEF0;
   --app-filter-active-bg:   #1A1A2E;
   --app-filter-active-color: #ffffff;
+
+  --app-searchbar-bg:       #F4F8F5;
+  --app-card-border-color:  transparent;
+  --app-done-btn-border:    #E4EDE7;
 }
 
-// ── Dark mode ─────────────────────────────────────────────────────────────────
+// ── Dark tokens (shared mixin via SCSS map) ────────────────────────────────────
+// Applied both via system preference and manual toggle class.
+
+@mixin dark-tokens {
+  --ion-background-color:     #0D1F13;
+  --ion-background-color-rgb: 13, 31, 19;
+  --ion-card-background:      #1A3024;
+  --ion-item-background:      #1A3024;
+  --ion-color-dark:           #DFF0E6;
+  --ion-color-medium:         #8AAF98;
+  --ion-color-light:          #1E3526;
+  --ion-color-light-shade:    #253D2D;
+
+  --app-bg:             #0D1F13;
+  --app-card:           #1A3024;
+  --app-card-shadow:    0 2px 0 rgba(255, 255, 255, 0.05);
+  --app-text-primary:   #DFF0E6;
+  --app-text-secondary: #8AAF98;
+  --app-text-label:     #5E8A72;
+  --app-divider:        #243D2D;
+
+  --app-task-completed-bg:   #1A3023;
+  --app-task-overdue-bg:     #1C1414;
+  --app-task-upcoming-bg:    #1E1D10;
+  --app-filter-active-bg:    #F0F7F2;
+  --app-filter-active-color: #0D1F13;
+
+  --app-searchbar-bg:      #182D20;
+  --app-card-border-color: rgba(255, 255, 255, 0.07);
+  --app-done-btn-border:   rgba(255, 255, 255, 0.20);
+}
+
+// ── Dark mode via system preference (auto) ─────────────────────────────────────
 @media (prefers-color-scheme: dark) {
-  :root {
-    --ion-background-color:     #0D1F13;
-    --ion-background-color-rgb: 13, 31, 19;
-    --ion-card-background:      #162A1D;
-    --ion-item-background:      #162A1D;
-    --ion-color-dark:           #E8F5EC;
-    --ion-color-medium:         #6B7D72;
-    --ion-color-light:          #1E3526;
-    --ion-color-light-shade:    #253D2D;
-
-    --app-bg:           #0D1F13;
-    --app-card:         #162A1D;
-    --app-text-primary: #E8F5EC;
-    --app-divider:      #1E3526;
-
-    --app-task-completed-bg:   #1A3023;
-    --app-task-overdue-bg:     #2A1515;
-    --app-task-upcoming-bg:    #252010;
-    --app-filter-active-bg:    #E8F5EC;
-    --app-filter-active-color: #0D1F13;
+  body:not(.theme-light) {
+    @include dark-tokens;
   }
+}
+
+// ── Dark mode via manual toggle ────────────────────────────────────────────────
+body.theme-dark {
+  @include dark-tokens;
+}
+
+// ── Light mode forced (overrides dark system preference) ──────────────────────
+body.theme-light {
+  --ion-background-color:     #F4F8F5;
+  --ion-background-color-rgb: 244, 248, 245;
+  --ion-card-background:      #FFFFFF;
+  --ion-item-background:      #FFFFFF;
+  --ion-color-dark:           initial;
+  --ion-color-medium:         initial;
+  --ion-color-light:          initial;
+  --ion-color-light-shade:    initial;
+
+  --app-bg:             #F4F8F5;
+  --app-card:           #FFFFFF;
+  --app-card-shadow:    0 2px 12px rgba(0, 0, 0, 0.08);
+  --app-text-primary:   #0F2419;
+  --app-text-secondary: #6B7D72;
+  --app-text-label:     #9BB0A2;
+  --app-divider:        #E4EDE7;
+
+  --app-task-completed-bg:   #F9FFF9;
+  --app-task-overdue-bg:     #FFF8F8;
+  --app-task-upcoming-bg:    #FFFEF0;
+  --app-filter-active-bg:    #1A1A2E;
+  --app-filter-active-color: #ffffff;
+
+  --app-searchbar-bg:      #F4F8F5;
+  --app-card-border-color: transparent;
+  --app-done-btn-border:   #E4EDE7;
 }

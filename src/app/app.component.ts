@@ -6,6 +6,7 @@ import { filter } from 'rxjs/operators';
 import { ITasksRepository, TASKS_REPOSITORY } from './core/repositories/tasks.repository';
 import { ICategoriesRepository, CATEGORIES_REPOSITORY } from './core/repositories/categories.repository';
 import { RemoteConfigService } from './core/services/remote-config.service';
+import { ThemeService } from './core/services/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -23,11 +24,16 @@ export class AppComponent implements OnInit, OnDestroy {
     @Inject(CATEGORIES_REPOSITORY) private readonly categoriesRepo: ICategoriesRepository,
     private readonly remoteConfigService: RemoteConfigService,
     private readonly router: Router,
-    private readonly platform: Platform
+    private readonly platform: Platform,
+    readonly themeService: ThemeService
   ) {}
 
   get enableCategories$(): Observable<boolean> {
     return this.remoteConfigService.enableCategories$;
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggle();
   }
 
   async ngOnInit(): Promise<void> {

@@ -21,6 +21,35 @@
   letter-spacing: 0.5px;
 }
 
+.theme-toggle {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  padding: 0;
+
+  ion-icon {
+    font-size: 1.15rem;
+    pointer-events: none;
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-50%) scale(0.88);
+  }
+}
+
 // Push router outlet below app-bar and above bottom-nav
 ion-router-outlet {
   margin-top: 52px;
