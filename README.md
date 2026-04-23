@@ -119,8 +119,7 @@ Desde GitHub → pestaña **Releases** → **Draft a new release** → tag `v1.0
 9. [Ejecución y compilación](#ejecución-y-compilación)
 10. [Estructura del proyecto](#estructura-del-proyecto)
 11. [Capturas de pantalla](#-capturas-de-pantalla)
-12. [Control de versiones](#control-de-versiones)
-13. [Desafíos técnicos](#desafíos-técnicos)
+12. [Desafíos técnicos](#desafíos-técnicos)
 
 ---
 
@@ -694,51 +693,6 @@ todo-app/
 
 ---
 
-## Control de versiones
-
-### Historial de commits
-
-| Hash | Descripción |
-|---|---|
-| `0f55891` | Expose app version and show it in splash screen |
-| `09295e7` | Add slide animations; update tsconfig & template |
-| `f751d7c` | Add animated splash screen and startup delay |
-| `78ad6a4` | Refactor category/task templates and layout |
-| `62471c6` | Implement tasks pagination and infinite scroll |
-| `72b6863` | Add mock data seeder and bundle SQL WASM |
-| `b22c3f2` | Integrate sql.js and SQLite repositories |
-| `a1fdab5` | Add checkColor to color presets |
-| `bbddaa9` | Add theme toggle and dark mode support |
-| `344cce1` | Refresh remote config on app resume |
-| `6f500be` | Introduce repositories and task view models |
-| `9e1db49` | Add state facades, remote config flags, and route guard for categories |
-| `50f152c` | Increase component style size limits |
-| `32fce71` | Add global notification component, replace toasts |
-| `b16a039` | Remove checkmarks from toast messages |
-| `333ebc7` | Refactor UI: app bar, bottom nav & pages |
-| `306b879` | Initialize remote config on startup |
-| `fc2eb8f` | Update Firebase dev config; ignore prod env |
-| `9507347` | Add Firebase Remote Config and task stats UI |
-| `56219ad` | Split tasks & categories into components and routes |
-| `d85443d` | Default to tasks, add tabs, init services |
-| `65fad2e` | Add tasks & categories features and core services |
-| `5d327eb` | Add @angular/fire, firebase and Ionic Storage |
-| `a079cd2` | feat: initial project setup — Ionic 7 + Angular NgModules + Capacitor |
-
-### `.gitignore` — archivos excluidos
-
-```
-node_modules/
-www/
-/dist
-src/environments/environment.prod.ts   ← claves de producción
-google-services.json                   ← claves Android Firebase
-GoogleService-Info.plist               ← claves iOS Firebase
-/platforms
-/plugins
-```
-
----
 
 ## Desafíos técnicos
 
