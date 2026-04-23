@@ -21,6 +21,7 @@
       "dom"
     ],
     "skipLibCheck": true,
+    "resolveJsonModule": true,
     "useDefineForClassFields": false,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true

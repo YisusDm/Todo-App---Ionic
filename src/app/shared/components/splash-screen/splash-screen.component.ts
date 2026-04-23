@@ -1,4 +1,5 @@
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
+import { Component, Inject, Input, ChangeDetectionStrategy } from '@angular/core';
+import { APP_VERSION } from '../../../core/tokens/app-version.token';
 
 @Component({
   selector: 'app-splash-screen',
@@ -9,4 +10,6 @@ import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 })
 export class SplashScreenComponent {
   @Input() isExiting = false;
+
+  constructor(@Inject(APP_VERSION) readonly version: string) {}
 }
