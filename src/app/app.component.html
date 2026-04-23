@@ -20,14 +20,15 @@
       <ion-icon [name]="activeTab === 'tasks' ? 'checkbox' : 'checkbox-outline'"></ion-icon>
       <span>Tareas</span>
     </button>
-    <button
-      *ngIf="enableCategories$ | async"
-      class="nav-item"
-      [class.active]="activeTab === 'categories'"
-      (click)="navigateTo('/categories')">
-      <ion-icon [name]="activeTab === 'categories' ? 'pricetags' : 'pricetags-outline'"></ion-icon>
-      <span>Categorías</span>
-    </button>
+    @if (enableCategories$ | async) {
+      <button
+        class="nav-item"
+        [class.active]="activeTab === 'categories'"
+        (click)="navigateTo('/categories')">
+        <ion-icon [name]="activeTab === 'categories' ? 'pricetags' : 'pricetags-outline'"></ion-icon>
+        <span>Categorías</span>
+      </button>
+    }
   </nav>
 
   <!-- Global notification modal -->

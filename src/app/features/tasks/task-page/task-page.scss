@@ -193,6 +193,11 @@ ion-content {
   border: 1px solid var(--app-card-border-color);
 }
 
+// Stagger: first 10 items animate in sequentially
+@for $i from 1 through 10 {
+  .task-slide:nth-child(#{$i}) { animation-delay: #{($i - 1) * 45}ms; }
+}
+
 // ── Task item ─────────────────────────────────────────────────────────────────
 .task-item {
   --padding-start: 0;
