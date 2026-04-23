@@ -1,3 +1,8 @@
+// Gives clearance so the last task isn't hidden behind the FAB
+ion-content {
+  --padding-bottom: 80px;
+}
+
 // ── Toolbar overrides ─────────────────────────────────────────────────────────
 .main-toolbar {
   --background: var(--app-primary-grad);
@@ -10,7 +15,7 @@
 }
 
 .search-toolbar {
-  --background: var(--app-bg);
+  --background: var(--app-searchbar-bg);
   padding-bottom: 4px;
 }
 
@@ -67,7 +72,7 @@
   ion-chip {
     flex-shrink: 0;
     margin: 0;
-    --background: white;
+    --background: var(--app-card);
     --color: var(--app-text-primary);
     border: 1.5px solid var(--app-divider);
     transition: all 0.2s;
@@ -105,9 +110,9 @@
   flex-shrink: 0;
   padding: 7px 14px;
   border-radius: 30px;
-  border: 1.5px solid #D1D5DB;
-  background: white;
-  color: #6B7280;
+  border: 1.5px solid var(--app-divider);
+  background: var(--app-card);
+  color: var(--app-text-secondary);
   font-size: 0.82rem;
   font-weight: 500;
   cursor: pointer;
@@ -117,9 +122,9 @@
   ion-icon { font-size: 0.8rem; }
 
   &.filter-active {
-    background: #1A1A2E;
-    border-color: #1A1A2E;
-    color: white;
+    background: var(--app-filter-active-bg);
+    border-color: var(--app-filter-active-bg);
+    color: var(--app-filter-active-color);
     font-weight: 700;
   }
 }
@@ -129,11 +134,12 @@
 
 .skeleton-card {
   display: flex;
-  background: white;
+  background: var(--app-card);
   border-radius: var(--app-card-radius);
   margin-bottom: 10px;
   overflow: hidden;
   box-shadow: var(--app-card-shadow);
+  border: 1px solid var(--app-card-border-color);
   min-height: 90px;
 }
 
@@ -173,11 +179,23 @@
 // ── Task list ─────────────────────────────────────────────────────────────────
 .task-list { padding: 4px 0 16px; }
 
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
 .task-slide {
+  animation: card-in 0.35s cubic-bezier(.34,1.2,.64,1) both;
   margin: 0 12px 10px;
   border-radius: var(--app-card-radius);
   overflow: hidden;
   box-shadow: var(--app-card-shadow);
+  border: 1px solid var(--app-card-border-color);
+}
+
+// Stagger: first 10 items animate in sequentially
+@for $i from 1 through 10 {
+  .task-slide:nth-child(#{$i}) { animation-delay: #{($i - 1) * 45}ms; }
 }
 
 // ── Task item ─────────────────────────────────────────────────────────────────
@@ -185,11 +203,11 @@
   --padding-start: 0;
   --inner-padding-end: 12px;
   --min-height: 0;
-  --background: white;
+  --background: var(--app-card);
 
-  &.task-completed { --background: #F9FFF9; opacity: 0.72; }
-  &.task-overdue   { --background: #FFF8F8; }
-  &.task-upcoming  { --background: #FFFEF0; }
+  &.task-completed { --background: var(--app-task-completed-bg); opacity: 0.72; }
+  &.task-overdue   { --background: var(--app-task-overdue-bg); }
+  &.task-upcoming  { --background: var(--app-task-upcoming-bg); }
 }
 
 .task-color-bar {
@@ -338,8 +356,8 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 2.5px solid #D1D5DB;
-  background: white;
+  border: 2.5px solid var(--app-done-btn-border);
+  background: var(--app-card);
   cursor: pointer;
   display: flex;
   align-items: center;

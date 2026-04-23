@@ -19,18 +19,7 @@ export class CategoryFormComponent implements OnInit {
   @Input() category?: Category;
 
   form!: FormGroup;
-  readonly PRESET_COLORS = [
-    '#FF5733',
-    '#FFC300',
-    '#28B463',
-    '#2E86C1',
-    '#8E44AD',
-    '#F39C12',
-    '#1ABC9C',
-    '#E74C3C',
-    '#3498DB',
-    '#95A5A6',
-  ];
+  readonly PRESET_COLORS: { hex: string; checkColor: string }[];
 
   get isEdit(): boolean {
     return !!this.category?.id;
@@ -43,7 +32,29 @@ export class CategoryFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private modalCtrl: ModalController
-  ) {}
+  ) {
+    const palette = [
+      '#FF5733', '#FFC300', '#28B463', '#2E86C1', '#8E44AD',
+      '#F39C12', '#1ABC9C', '#E74C3C', '#3498DB', '#95A5A6',
+    ];
+    this.PRESET_COLORS = palette.map(hex => ({
+      hex,
+      checkColor: this.wcagCheckColor(hex),
+    }));
+  }
+
+  // Returns black or white depending on which has >= 3:1 contrast against the bg.
+  // Threshold: relative luminance > 0.3 means white falls below 3:1 → use black.
+  private wcagCheckColor(hex: string): string {
+    const h = hex.replace('#', '');
+    const toLinear = (c: number) =>
+      c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    const r = toLinear(parseInt(h.slice(0, 2), 16) / 255);
+    const g = toLinear(parseInt(h.slice(2, 4), 16) / 255);
+    const b = toLinear(parseInt(h.slice(4, 6), 16) / 255);
+    const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return L > 0.3 ? '#000000' : '#ffffff';
+  }
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -55,7 +66,7 @@ export class CategoryFormComponent implements OnInit {
           Validators.maxLength(30),
         ],
       ],
-      color: [this.category?.color ?? this.PRESET_COLORS[0], Validators.required],
+      color: [this.category?.color ?? this.PRESET_COLORS[0].hex, Validators.required],
     });
   }
 

@@ -1,7 +1,15 @@
 <ion-app>
+  <!-- Splash screen on cold start -->
+  @if (showSplash) {
+    <app-splash-screen [isExiting]="splashExiting"></app-splash-screen>
+  }
+
   <!-- Global app bar -->
   <div class="app-bar">
     <span class="app-bar-title">To Do App</span>
+    <button class="theme-toggle" (click)="toggleTheme()" [attr.aria-label]="(themeService.isDark$ | async) ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'">
+      <ion-icon [name]="(themeService.isDark$ | async) ? 'sunny-outline' : 'moon-outline'"></ion-icon>
+    </button>
   </div>
 
   <ion-router-outlet></ion-router-outlet>
@@ -12,10 +20,15 @@
       <ion-icon [name]="activeTab === 'tasks' ? 'checkbox' : 'checkbox-outline'"></ion-icon>
       <span>Tareas</span>
     </button>
-    <button class="nav-item" [class.active]="activeTab === 'categories'" (click)="navigateTo('/categories')">
-      <ion-icon [name]="activeTab === 'categories' ? 'pricetags' : 'pricetags-outline'"></ion-icon>
-      <span>Categorías</span>
-    </button>
+    @if (enableCategories$ | async) {
+      <button
+        class="nav-item"
+        [class.active]="activeTab === 'categories'"
+        (click)="navigateTo('/categories')">
+        <ion-icon [name]="activeTab === 'categories' ? 'pricetags' : 'pricetags-outline'"></ion-icon>
+        <span>Categorías</span>
+      </button>
+    }
   </nav>
 
   <!-- Global notification modal -->

@@ -78,3 +78,5 @@ Thumbs.db
 
 # Firebase — never commit real keys
 src/environments/environment.prod.ts
+google-services.json
+GoogleService-Info.plist

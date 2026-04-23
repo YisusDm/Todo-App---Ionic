@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
+import { categoriesFeatureGuard } from './core/guards/categories-feature.guard';
 
 const routes: Routes = [
   {
@@ -14,6 +15,7 @@ const routes: Routes = [
   },
   {
     path: 'categories',
+    canActivate: [categoriesFeatureGuard],
     loadChildren: () =>
       import('./features/categories/categories.module').then(
         m => m.CategoriesModule

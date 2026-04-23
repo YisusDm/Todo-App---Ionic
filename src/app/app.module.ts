@@ -11,10 +11,11 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { CoreModule } from './core/core.module';
 import { NotificationComponent } from './shared/components/notification/notification.component';
+import { SplashScreenComponent } from './shared/components/splash-screen/splash-screen.component';
 import { environment } from '../environments/environment';
 
 @NgModule({
-  declarations: [AppComponent, NotificationComponent],
+  declarations: [AppComponent, NotificationComponent, SplashScreenComponent],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,

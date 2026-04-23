@@ -1,53 +1,60 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar class="search-toolbar">
     <ion-searchbar
-      [formControl]="searchSubject"
+      [formControl]="tasksFacade.searchControl"
       placeholder="Buscar tareas..."
       animated="true">
     </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content>
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- Statistics panel (Firebase Remote Config feature flag) -->
-  <div *ngIf="showTaskStats$ | async" class="stats-panel">
-    <div class="stats-grid" *ngIf="stats$ | async as stats">
-      <div class="stat-item">
-        <span class="stat-value">{{ stats.total }}</span>
-        <span class="stat-label">Total</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-value completed-val">{{ stats.completed }}</span>
-        <span class="stat-label">Listas</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-value pending-val">{{ stats.pending }}</span>
-        <span class="stat-label">Pendientes</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-value">{{ stats.completionPercentage }}%</span>
-        <span class="stat-label">Avance</span>
-      </div>
+  <!-- Statistics panel (Firebase Remote Config: show_task_stats) -->
+  @if (tasksFacade.showTaskStats$ | async) {
+    <div class="stats-panel">
+      @if (tasksFacade.stats$ | async; as stats) {
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-value">{{ stats.total }}</span>
+            <span class="stat-label">Total</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value completed-val">{{ stats.completed }}</span>
+            <span class="stat-label">Listas</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value pending-val">{{ stats.pending }}</span>
+            <span class="stat-label">Pendientes</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-value">{{ stats.completionPercentage }}%</span>
+            <span class="stat-label">Avance</span>
+          </div>
+        </div>
+      }
     </div>
-  </div>
+  }
 
-  <!-- Category filter chips -->
-  <div class="category-filters">
-    <ion-chip [class.active]="selectedCategory === null" (click)="filterByCategory(null)">
-      <ion-label>Todas</ion-label>
-    </ion-chip>
-    <ion-chip
-      *ngFor="let cat of categories$ | async; trackBy: trackByCategoryId"
-      [class.active]="selectedCategory === cat.id"
-      (click)="filterByCategory(cat.id)">
-      <span class="cat-dot" [style.background]="cat.color"></span>
-      <ion-label>{{ cat.name }}</ion-label>
-    </ion-chip>
-  </div>
+  <!-- Category filter chips (Remote Config: enable_categories) -->
+  @if (tasksFacade.enableCategories$ | async) {
+    <div class="category-filters">
+      <ion-chip [class.active]="selectedCategory === null" (click)="filterByCategory(null)">
+        <ion-label>Todas</ion-label>
+      </ion-chip>
+      @for (cat of (tasksFacade.categories$ | async) ?? []; track cat.id) {
+        <ion-chip
+          [class.active]="selectedCategory === cat.id"
+          (click)="filterByCategory(cat.id)">
+          <span class="cat-dot" [style.background]="cat.color"></span>
+          <ion-label>{{ cat.name }}</ion-label>
+        </ion-chip>
+      }
+    </div>
+  }
 
   <!-- Status filters — pill style -->
   <div class="status-filters">
@@ -55,160 +62,178 @@
       class="filter-pill"
       [class.filter-active]="currentFilter === TaskFilter.ALL"
       (click)="filterByState(TaskFilter.ALL)">
-      <i class="bi bi-check" *ngIf="currentFilter === TaskFilter.ALL"></i>
+      @if (currentFilter === TaskFilter.ALL) { <i class="bi bi-check"></i> }
       Todas
     </button>
     <button
       class="filter-pill"
       [class.filter-active]="currentFilter === TaskFilter.PENDING"
       (click)="filterByState(TaskFilter.PENDING)">
-      <i class="bi bi-check" *ngIf="currentFilter === TaskFilter.PENDING"></i>
+      @if (currentFilter === TaskFilter.PENDING) { <i class="bi bi-check"></i> }
       Pendientes
     </button>
     <button
       class="filter-pill"
       [class.filter-active]="currentFilter === TaskFilter.COMPLETED"
       (click)="filterByState(TaskFilter.COMPLETED)">
-      <i class="bi bi-check" *ngIf="currentFilter === TaskFilter.COMPLETED"></i>
+      @if (currentFilter === TaskFilter.COMPLETED) { <i class="bi bi-check"></i> }
       Listas
     </button>
     <button
       class="filter-pill"
       [class.filter-active]="currentFilter === TaskFilter.OVERDUE"
       (click)="filterByState(TaskFilter.OVERDUE)">
-      <i class="bi bi-check" *ngIf="currentFilter === TaskFilter.OVERDUE"></i>
+      @if (currentFilter === TaskFilter.OVERDUE) { <i class="bi bi-check"></i> }
       Vencidas
     </button>
   </div>
 
   <!-- Loading skeleton -->
-  <div *ngIf="isLoading" class="skeleton-list">
-    <div *ngFor="let i of [1,2,3,4]" class="skeleton-card">
-      <div class="sk-bar"></div>
-      <div class="sk-body">
-        <ion-skeleton-text animated style="width:55%; height:15px; margin-bottom:8px; border-radius:6px;"></ion-skeleton-text>
-        <ion-skeleton-text animated style="width:70%; height:11px; margin-bottom:10px; border-radius:6px;"></ion-skeleton-text>
-        <div style="display:flex; gap:12px;">
-          <ion-skeleton-text animated style="width:28%; height:28px; border-radius:8px;"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width:28%; height:28px; border-radius:8px;"></ion-skeleton-text>
-          <ion-skeleton-text animated style="width:28%; height:28px; border-radius:8px;"></ion-skeleton-text>
+  @if (isLoading) {
+    <div class="skeleton-list">
+      @for (i of [1,2,3,4]; track $index) {
+        <div class="skeleton-card">
+          <div class="sk-bar"></div>
+          <div class="sk-body">
+            <ion-skeleton-text animated style="width:55%; height:15px; margin-bottom:8px; border-radius:6px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width:70%; height:11px; margin-bottom:10px; border-radius:6px;"></ion-skeleton-text>
+            <div style="display:flex; gap:12px;">
+              <ion-skeleton-text animated style="width:28%; height:28px; border-radius:8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width:28%; height:28px; border-radius:8px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width:28%; height:28px; border-radius:8px;"></ion-skeleton-text>
+            </div>
+          </div>
         </div>
-      </div>
+      }
     </div>
-  </div>
+  }
 
   <!-- Empty state -->
-  <div *ngIf="!isLoading && (filteredTasks$ | async)?.length === 0" class="empty-state">
-    <ion-icon name="checkmark-done-circle-outline"></ion-icon>
-    <h3>Sin tareas</h3>
-    <p>Toca el <strong>+</strong> para agregar tu primera tarea</p>
-  </div>
+  @if (!isLoading && (tasksFacade.filteredTasksVm$ | async)?.length === 0) {
+    <div class="empty-state">
+      <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+      <h3>Sin tareas</h3>
+      <p>Toca el <strong>+</strong> para agregar tu primera tarea</p>
+    </div>
+  }
 
   <!-- Task list -->
-  <div *ngIf="!isLoading && (filteredTasks$ | async)?.length! > 0" class="task-list">
-    <ion-list lines="none">
-      <ion-reorder-group [disabled]="!reorderEnabled" (ionItemReorder)="handleReorder($event)">
+  @if (!isLoading && ((tasksFacade.filteredTasksVm$ | async)?.length ?? 0) > 0) {
+    <div class="task-list">
+      <ion-list lines="none">
+        <ion-reorder-group [disabled]="!reorderEnabled" (ionItemReorder)="handleReorder($any($event))">
 
-        <ion-item-sliding
-          #slidingItem
-          *ngFor="let task of filteredTasks$ | async; trackBy: trackByTaskId"
-          class="task-slide">
+          @for (vm of (tasksFacade.displayedTasksVm$ | async) ?? []; track vm.task.id) {
+            <ion-item-sliding #slidingItem class="task-slide">
 
-          <ion-item-options side="start">
-            <ion-item-option
-              [color]="task.completed ? 'warning' : 'success'"
-              (click)="toggleComplete(task, slidingItem)">
-              <ion-icon slot="icon-only" [name]="task.completed ? 'refresh-outline' : 'checkmark-outline'"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
+              <ion-item-options side="start">
+                <ion-item-option
+                  [color]="vm.task.completed ? 'warning' : 'success'"
+                  (click)="toggleComplete(vm, slidingItem)">
+                  <ion-icon slot="icon-only" [name]="vm.task.completed ? 'refresh-outline' : 'checkmark-outline'"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
 
-          <ion-item
-            class="task-item"
-            [class.task-completed]="task.completed"
-            [class.task-overdue]="isOverdue(task)"
-            [class.task-upcoming]="isUpcomingDue(task)"
-            (click)="openTaskModal(task)">
+              <ion-item
+                class="task-item"
+                [class.task-completed]="vm.task.completed"
+                [class.task-overdue]="vm.isOverdue"
+                [class.task-upcoming]="vm.isUpcomingDue"
+                (click)="openTaskModal(vm.task)">
 
-            <!-- Left color bar -->
-            <div
-              class="task-color-bar"
-              slot="start"
-              [style.background]="getCategoryColor(task.categoryId, categories$ | async)">
-            </div>
+                <div class="task-color-bar" slot="start" [style.background]="vm.categoryColor"></div>
 
-            <ion-label class="task-label">
+                <ion-label class="task-label">
 
-              <!-- Title -->
-              <h2 class="task-title" [class.strikethrough]="task.completed">{{ task.title }}</h2>
+                  <h2 class="task-title" [class.strikethrough]="vm.task.completed">{{ vm.task.title }}</h2>
 
-              <!-- Badges row -->
-              <div class="task-badges">
-                <span class="cat-label" *ngIf="task.categoryId">
-                  <span class="cat-dot-sm" [style.background]="getCategoryColor(task.categoryId, categories$ | async)"></span>
-                  {{ getCategoryName(task.categoryId, categories$ | async) }}
-                </span>
-                <span class="status-badge" [class.badge-done]="task.completed" [class.badge-pending]="!task.completed">
-                  <i class="bi" [class.bi-check-circle-fill]="task.completed" [class.bi-clock]="!task.completed"></i>
-                  {{ task.completed ? 'Lista' : 'Pendiente' }}
-                </span>
-                <span class="priority-badge" *ngIf="isOverdue(task)">
-                  <i class="bi bi-exclamation-triangle-fill"></i> Alta prioridad
-                </span>
-              </div>
+                  <div class="task-badges">
+                    @if (vm.task.categoryId) {
+                      <span class="cat-label">
+                        <span class="cat-dot-sm" [style.background]="vm.categoryColor"></span>
+                        {{ vm.categoryName }}
+                      </span>
+                    }
+                    <span class="status-badge" [class.badge-done]="vm.task.completed" [class.badge-pending]="!vm.task.completed">
+                      <i class="bi" [class.bi-check-circle-fill]="vm.task.completed" [class.bi-clock]="!vm.task.completed"></i>
+                      {{ vm.task.completed ? 'Lista' : 'Pendiente' }}
+                    </span>
+                    @if (vm.isOverdue) {
+                      <span class="priority-badge">
+                        <i class="bi bi-exclamation-triangle-fill"></i> Alta prioridad
+                      </span>
+                    }
+                  </div>
 
-              <!-- Description -->
-              <p *ngIf="task.description" class="task-desc">{{ task.description }}</p>
+                  @if (vm.task.description) {
+                    <p class="task-desc">{{ vm.task.description }}</p>
+                  }
 
-              <!-- Divider -->
-              <div class="task-divider"></div>
+                  <div class="task-divider"></div>
 
-              <!-- 3-column data row -->
-              <div class="task-data-row">
-                <div class="data-col">
-                  <span class="data-value" [class.value-danger]="getDaysOpen(task) > 7">{{ getDaysOpen(task) }} día(s)</span>
-                  <span class="data-label">Abierta</span>
-                </div>
-                <div class="data-divider"></div>
-                <div class="data-col">
-                  <span class="data-value">{{ formatDate(task.createdAt) }}</span>
-                  <span class="data-label">Creada</span>
-                </div>
-                <div class="data-divider"></div>
-                <div class="data-col">
-                  <span class="data-value"
-                    [class.value-danger]="isOverdue(task)"
-                    [class.value-warning]="isUpcomingDue(task) && !isOverdue(task)">
-                    {{ task.dueDate ? formatDate(task.dueDate) : '—' }}
-                  </span>
-                  <span class="data-label">Vence</span>
-                </div>
-              </div>
+                  <div class="task-data-row">
+                    <div class="data-col">
+                      <span class="data-value" [class.value-danger]="vm.daysOpen > 7">{{ vm.daysOpen }} día(s)</span>
+                      <span class="data-label">Abierta</span>
+                    </div>
+                    <div class="data-divider"></div>
+                    <div class="data-col">
+                      <span class="data-value">{{ vm.formattedCreatedAt }}</span>
+                      <span class="data-label">Creada</span>
+                    </div>
+                    <div class="data-divider"></div>
+                    <div class="data-col">
+                      <span class="data-value"
+                        [class.value-danger]="vm.isOverdue"
+                        [class.value-warning]="vm.isUpcomingDue && !vm.isOverdue">
+                        {{ vm.formattedDueDate }}
+                      </span>
+                      <span class="data-label">Vence</span>
+                    </div>
+                  </div>
 
-            </ion-label>
+                </ion-label>
 
-            <!-- Done circle button -->
-            <button
-              slot="end"
-              class="done-btn"
-              [class.done-btn-active]="task.completed"
-              (click)="toggleComplete(task, slidingItem); $event.stopPropagation()"
-              [attr.aria-label]="task.completed ? 'Marcar pendiente' : 'Marcar como lista'">
-              <ion-icon *ngIf="task.completed" name="checkmark" class="done-check"></ion-icon>
-            </button>
+                <button
+                  slot="end"
+                  class="done-btn"
+                  [class.done-btn-active]="vm.task.completed"
+                  (click)="toggleComplete(vm, slidingItem); $event.stopPropagation()"
+                  [attr.aria-label]="vm.task.completed ? 'Marcar pendiente' : 'Marcar como lista'">
+                  @if (vm.task.completed) {
+                    <ion-icon name="checkmark" class="done-check"></ion-icon>
+                  }
+                </button>
 
-            <ion-reorder *ngIf="reorderEnabled" slot="end"></ion-reorder>
-          </ion-item>
+                @if (reorderEnabled) {
+                  <ion-reorder slot="end"></ion-reorder>
+                }
+              </ion-item>
 
-          <ion-item-options side="end">
-            <ion-item-option color="danger" (click)="confirmDelete(task.id, slidingItem)">
-              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-            </ion-item-option>
-          </ion-item-options>
+              <ion-item-options side="end">
+                <ion-item-option color="danger" (click)="confirmDelete(vm.task.id, slidingItem)">
+                  <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
 
-        </ion-item-sliding>
-      </ion-reorder-group>
-    </ion-list>
-  </div>
+            </ion-item-sliding>
+          }
+
+        </ion-reorder-group>
+      </ion-list>
+    </div>
+  }
+
+  <!-- Infinite scroll — direct child of ion-content -->
+  <ion-infinite-scroll
+    threshold="150px"
+    [disabled]="!(tasksFacade.hasMore$ | async)"
+    (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content
+      loadingSpinner="crescent"
+      loadingText="Cargando más tareas...">
+    </ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">
     <ion-fab-button (click)="openTaskModal()">
