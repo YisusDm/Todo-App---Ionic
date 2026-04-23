@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { TaskService } from './core/services/task.service';
 import { CategoryService } from './core/services/category.service';
@@ -21,10 +22,14 @@ export class AppComponent implements OnInit {
     private router: Router
   ) {}
 
+  get enableCategories$(): Observable<boolean> {
+    return this.remoteConfigService.enableCategories$;
+  }
+
   async ngOnInit(): Promise<void> {
     await this.categoryService.init();
     await this.taskService.init();
-    await this.remoteConfigService.init();
+    await this.remoteConfigService.ensureInitialized();
 
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))

@@ -12,7 +12,11 @@
       <ion-icon [name]="activeTab === 'tasks' ? 'checkbox' : 'checkbox-outline'"></ion-icon>
       <span>Tareas</span>
     </button>
-    <button class="nav-item" [class.active]="activeTab === 'categories'" (click)="navigateTo('/categories')">
+    <button
+      *ngIf="enableCategories$ | async"
+      class="nav-item"
+      [class.active]="activeTab === 'categories'"
+      (click)="navigateTo('/categories')">
       <ion-icon [name]="activeTab === 'categories' ? 'pricetags' : 'pricetags-outline'"></ion-icon>
       <span>Categorías</span>
     </button>

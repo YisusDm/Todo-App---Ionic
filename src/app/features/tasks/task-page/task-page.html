@@ -1,7 +1,7 @@
 <ion-header [translucent]="true">
   <ion-toolbar class="search-toolbar">
     <ion-searchbar
-      [formControl]="searchSubject"
+      [formControl]="tasksFacade.searchControl"
       placeholder="Buscar tareas..."
       animated="true">
     </ion-searchbar>
@@ -14,8 +14,8 @@
   </ion-refresher>
 
   <!-- Statistics panel (Firebase Remote Config feature flag) -->
-  <div *ngIf="showTaskStats$ | async" class="stats-panel">
-    <div class="stats-grid" *ngIf="stats$ | async as stats">
+  <div *ngIf="tasksFacade.showTaskStats$ | async" class="stats-panel">
+    <div class="stats-grid" *ngIf="tasksFacade.stats$ | async as stats">
       <div class="stat-item">
         <span class="stat-value">{{ stats.total }}</span>
         <span class="stat-label">Total</span>
@@ -35,13 +35,13 @@
     </div>
   </div>
 
-  <!-- Category filter chips -->
-  <div class="category-filters">
+  <!-- Category filter chips (Remote Config: enable_categories) -->
+  <div *ngIf="tasksFacade.enableCategories$ | async" class="category-filters">
     <ion-chip [class.active]="selectedCategory === null" (click)="filterByCategory(null)">
       <ion-label>Todas</ion-label>
     </ion-chip>
     <ion-chip
-      *ngFor="let cat of categories$ | async; trackBy: trackByCategoryId"
+      *ngFor="let cat of tasksFacade.categories$ | async; trackBy: trackByCategoryId"
       [class.active]="selectedCategory === cat.id"
       (click)="filterByCategory(cat.id)">
       <span class="cat-dot" [style.background]="cat.color"></span>
@@ -98,20 +98,20 @@
   </div>
 
   <!-- Empty state -->
-  <div *ngIf="!isLoading && (filteredTasks$ | async)?.length === 0" class="empty-state">
+  <div *ngIf="!isLoading && (tasksFacade.filteredTasks$ | async)?.length === 0" class="empty-state">
     <ion-icon name="checkmark-done-circle-outline"></ion-icon>
     <h3>Sin tareas</h3>
     <p>Toca el <strong>+</strong> para agregar tu primera tarea</p>
   </div>
 
   <!-- Task list -->
-  <div *ngIf="!isLoading && (filteredTasks$ | async)?.length! > 0" class="task-list">
+  <div *ngIf="!isLoading && (tasksFacade.filteredTasks$ | async)?.length! > 0" class="task-list">
     <ion-list lines="none">
-      <ion-reorder-group [disabled]="!reorderEnabled" (ionItemReorder)="handleReorder($event)">
+      <ion-reorder-group [disabled]="!reorderEnabled" (ionItemReorder)="handleReorder($any($event))">
 
         <ion-item-sliding
           #slidingItem
-          *ngFor="let task of filteredTasks$ | async; trackBy: trackByTaskId"
+          *ngFor="let task of tasksFacade.filteredTasks$ | async; trackBy: trackByTaskId"
           class="task-slide">
 
           <ion-item-options side="start">
@@ -125,15 +125,15 @@
           <ion-item
             class="task-item"
             [class.task-completed]="task.completed"
-            [class.task-overdue]="isOverdue(task)"
-            [class.task-upcoming]="isUpcomingDue(task)"
+            [class.task-overdue]="tasksFacade.isOverdue(task)"
+            [class.task-upcoming]="tasksFacade.isUpcomingDue(task)"
             (click)="openTaskModal(task)">
 
             <!-- Left color bar -->
             <div
               class="task-color-bar"
               slot="start"
-              [style.background]="getCategoryColor(task.categoryId, categories$ | async)">
+              [style.background]="tasksFacade.getCategoryColor(task.categoryId, tasksFacade.categories$ | async)">
             </div>
 
             <ion-label class="task-label">
@@ -144,14 +144,14 @@
               <!-- Badges row -->
               <div class="task-badges">
                 <span class="cat-label" *ngIf="task.categoryId">
-                  <span class="cat-dot-sm" [style.background]="getCategoryColor(task.categoryId, categories$ | async)"></span>
-                  {{ getCategoryName(task.categoryId, categories$ | async) }}
+                  <span class="cat-dot-sm" [style.background]="tasksFacade.getCategoryColor(task.categoryId, tasksFacade.categories$ | async)"></span>
+                  {{ tasksFacade.getCategoryName(task.categoryId, tasksFacade.categories$ | async) }}
                 </span>
                 <span class="status-badge" [class.badge-done]="task.completed" [class.badge-pending]="!task.completed">
                   <i class="bi" [class.bi-check-circle-fill]="task.completed" [class.bi-clock]="!task.completed"></i>
                   {{ task.completed ? 'Lista' : 'Pendiente' }}
                 </span>
-                <span class="priority-badge" *ngIf="isOverdue(task)">
+                <span class="priority-badge" *ngIf="tasksFacade.isOverdue(task)">
                   <i class="bi bi-exclamation-triangle-fill"></i> Alta prioridad
                 </span>
               </div>
@@ -165,20 +165,20 @@
               <!-- 3-column data row -->
               <div class="task-data-row">
                 <div class="data-col">
-                  <span class="data-value" [class.value-danger]="getDaysOpen(task) > 7">{{ getDaysOpen(task) }} día(s)</span>
+                  <span class="data-value" [class.value-danger]="tasksFacade.getDaysOpen(task) > 7">{{ tasksFacade.getDaysOpen(task) }} día(s)</span>
                   <span class="data-label">Abierta</span>
                 </div>
                 <div class="data-divider"></div>
                 <div class="data-col">
-                  <span class="data-value">{{ formatDate(task.createdAt) }}</span>
+                  <span class="data-value">{{ tasksFacade.formatDate(task.createdAt) }}</span>
                   <span class="data-label">Creada</span>
                 </div>
                 <div class="data-divider"></div>
                 <div class="data-col">
                   <span class="data-value"
-                    [class.value-danger]="isOverdue(task)"
-                    [class.value-warning]="isUpcomingDue(task) && !isOverdue(task)">
-                    {{ task.dueDate ? formatDate(task.dueDate) : '—' }}
+                    [class.value-danger]="tasksFacade.isOverdue(task)"
+                    [class.value-warning]="tasksFacade.isUpcomingDue(task) && !tasksFacade.isOverdue(task)">
+                    {{ task.dueDate ? tasksFacade.formatDate(task.dueDate) : '—' }}
                   </span>
                   <span class="data-label">Vence</span>
                 </div>
