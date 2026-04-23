@@ -1,0 +1,312 @@
+// ─── Host ─────────────────────────────────────────────────────────────────────
+:host {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: block;
+}
+
+// ─── Root container ───────────────────────────────────────────────────────────
+.splash {
+  position: absolute;
+  inset: 0;
+  background: #070f07;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+// Exit: flash-bright then vanish
+.splash--exit {
+  animation: splash-exit 0.75s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes splash-exit {
+  0%   { opacity: 1; transform: scale(1);    filter: brightness(1); }
+  50%  { opacity: 1; transform: scale(1.04); filter: brightness(2); }
+  100% { opacity: 0; transform: scale(1.06); filter: brightness(4); }
+}
+
+// ─── Ambient orbs ─────────────────────────────────────────────────────────────
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: orb-float ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 320px; height: 320px;
+  top: -100px; left: -80px;
+  background: radial-gradient(circle, rgba(22,163,74,.20) 0%, transparent 70%);
+  animation-duration: 9s; animation-delay: 0s;
+}
+.orb-2 {
+  width: 240px; height: 240px;
+  bottom: -60px; right: -60px;
+  background: radial-gradient(circle, rgba(22,163,74,.16) 0%, transparent 70%);
+  animation-duration: 11s; animation-delay: -4s;
+}
+.orb-3 {
+  width: 160px; height: 160px;
+  top: 32%; right: 8%;
+  background: radial-gradient(circle, rgba(74,222,128,.12) 0%, transparent 70%);
+  animation-duration: 13s; animation-delay: -7s;
+  opacity: .7;
+}
+.orb-4 {
+  width: 120px; height: 120px;
+  bottom: 22%; left: 6%;
+  background: radial-gradient(circle, rgba(74,222,128,.10) 0%, transparent 70%);
+  animation-duration: 10s; animation-delay: -2s;
+  opacity: .6;
+}
+
+@keyframes orb-float {
+  0%, 100% { transform: translateY(0)    scale(1);    }
+  50%       { transform: translateY(-22px) scale(1.06); }
+}
+
+// ─── Grid overlay ─────────────────────────────────────────────────────────────
+.grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(22,163,74,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22,163,74,.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  opacity: 0;
+  animation: grid-in 1.5s ease 0.2s forwards;
+}
+
+@keyframes grid-in {
+  to { opacity: 1; }
+}
+
+// ─── Corner decorators ────────────────────────────────────────────────────────
+.corner {
+  position: absolute;
+  width: 40px; height: 40px;
+  border-color: rgba(22,163,74,.4);
+  border-style: solid;
+  pointer-events: none;
+  opacity: 0;
+  animation: corner-in 0.5s ease 0.6s forwards;
+}
+
+.corner-tl { top: 20px; left: 20px; border-width: 2px 0 0 2px; }
+.corner-br { bottom: 20px; right: 20px; border-width: 0 2px 2px 0; }
+
+@keyframes corner-in {
+  to { opacity: 1; }
+}
+
+// ─── Center stage ─────────────────────────────────────────────────────────────
+.splash__center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+// ─── Ring wrap ────────────────────────────────────────────────────────────────
+.ring-wrap {
+  position: relative;
+  width: 148px; height: 148px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 36px;
+}
+
+// Pulse rings
+.pulse {
+  position: absolute;
+  border-radius: 50%;
+  border: 1.5px solid rgba(22,163,74,.5);
+  width: 148px; height: 148px;
+  animation: pulse-out 3s ease-out infinite;
+}
+
+.pulse-1 { animation-delay: 1.2s; }
+.pulse-2 { animation-delay: 2.0s; }
+.pulse-3 { animation-delay: 2.8s; }
+
+@keyframes pulse-out {
+  0%   { transform: scale(1);   opacity: .7; }
+  100% { transform: scale(2.6); opacity: 0;  }
+}
+
+// SVG ring
+.ring-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: rgba(255,255,255,.06);
+  stroke-width: 2.5;
+}
+
+// r=52 → C = 2π×52 ≈ 326.7
+.ring-fill {
+  fill: none;
+  stroke: url(#ring-gradient);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-dasharray: 327;
+  stroke-dashoffset: 327;
+  filter: drop-shadow(0 0 8px rgba(22,163,74,.9));
+  animation: ring-draw 1.3s cubic-bezier(.4,0,.2,1) 0.3s forwards;
+}
+
+// The gradient is defined inline in the SVG — fallback to solid green
+// We override stroke color via CSS custom property trick if needed
+.ring-fill { stroke: #16a34a; }
+
+@keyframes ring-draw {
+  from { stroke-dashoffset: 327; }
+  to   { stroke-dashoffset: 0;   }
+}
+
+// Icon inside ring
+.splash__icon {
+  position: relative;
+  z-index: 1;
+  font-size: 60px;
+  color: #16a34a;
+  filter: drop-shadow(0 0 14px rgba(22,163,74,.7));
+  opacity: 0;
+  transform: scale(.3) rotate(-15deg);
+  animation: icon-emerge 0.65s cubic-bezier(.34,1.56,.64,1) 1.4s forwards;
+}
+
+@keyframes icon-emerge {
+  from { opacity: 0; transform: scale(.3) rotate(-15deg); }
+  to   { opacity: 1; transform: scale(1)  rotate(0deg);   }
+}
+
+// ─── Title ────────────────────────────────────────────────────────────────────
+.splash__title {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  margin: 0 0 10px;
+  font-size: 2.1rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(24px);
+}
+
+.word-1 { animation: word-up .6s cubic-bezier(.34,1.2,.64,1) 1.7s forwards; }
+.word-2 {
+  color: #4ade80;
+  animation: word-up .6s cubic-bezier(.34,1.2,.64,1) 1.9s forwards;
+}
+
+@keyframes word-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+// ─── Tagline ──────────────────────────────────────────────────────────────────
+.splash__tagline {
+  font-size: .72rem;
+  color: rgba(255,255,255,.4);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin: 0 0 22px;
+  opacity: 0;
+  animation: fade-up .5s ease 2.15s forwards;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+
+// ─── Version badge ────────────────────────────────────────────────────────────
+.splash__version {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(22,163,74,.12);
+  border: 1px solid rgba(22,163,74,.35);
+  color: #4ade80;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  padding: 5px 16px 5px 12px;
+  border-radius: 100px;
+  opacity: 0;
+  transform: scale(.5);
+  animation: badge-pop .55s cubic-bezier(.34,1.56,.64,1) 2.4s forwards;
+}
+
+.version-dot {
+  width: 7px; height: 7px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #4ade80;
+  animation: dot-pulse 1.4s ease-in-out 3s infinite;
+}
+
+@keyframes badge-pop {
+  from { opacity: 0; transform: scale(.5); }
+  to   { opacity: 1; transform: scale(1);  }
+}
+
+@keyframes dot-pulse {
+  0%, 100% { opacity: 1; transform: scale(1);   }
+  50%       { opacity: .4; transform: scale(.7); }
+}
+
+// ─── Loading bar ──────────────────────────────────────────────────────────────
+.splash__bar {
+  position: absolute;
+  bottom: 36px;
+  left: 44px;
+  right: 44px;
+  height: 1.5px;
+  background: rgba(255,255,255,.08);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.splash__bar-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    transparent,
+    #16a34a 20%,
+    #4ade80 50%,
+    #16a34a 80%,
+    transparent
+  );
+  animation: bar-sweep 2.8s cubic-bezier(.4,0,.2,1) 0.4s forwards;
+}
+
+@keyframes bar-sweep {
+  0%   { width: 0%;   }
+  15%  { width: 20%;  }
+  40%  { width: 55%;  }
+  70%  { width: 80%;  }
+  100% { width: 100%; }
+}

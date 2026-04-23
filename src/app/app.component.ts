@@ -17,7 +17,10 @@ import { MockDataService } from './core/services/mock-data.service';
 })
 export class AppComponent implements OnInit, OnDestroy {
   activeTab = 'tasks';
+  showSplash = true;
+  splashExiting = false;
 
+  private readonly MIN_SPLASH_MS = 3300;
   private resumeSub: Subscription | null = null;
 
   constructor(
@@ -39,10 +42,20 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   async ngOnInit(): Promise<void> {
+    const t0 = Date.now();
+
     await this.categoriesRepo.init();
     await this.tasksRepo.init();
     await this.remoteConfigService.ensureInitialized();
     await this.mockDataService.seedIfEmpty();
+
+    const elapsed = Date.now() - t0;
+    const exitDelay = Math.max(0, this.MIN_SPLASH_MS - elapsed);
+
+    setTimeout(() => {
+      this.splashExiting = true;
+      setTimeout(() => { this.showSplash = false; }, 750);
+    }, exitDelay);
 
     this.resumeSub = this.platform.resume.subscribe(() => {
       void this.remoteConfigService.refresh();

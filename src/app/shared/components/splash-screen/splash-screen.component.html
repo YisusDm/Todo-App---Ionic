@@ -1,0 +1,55 @@
+<div class="splash" [class.splash--exit]="isExiting">
+
+  <!-- Ambient background orbs -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+
+  <!-- Grid overlay -->
+  <div class="grid-overlay"></div>
+
+  <!-- Center stage -->
+  <div class="splash__center">
+
+    <!-- Ring + icon -->
+    <div class="ring-wrap">
+      <div class="pulse pulse-1"></div>
+      <div class="pulse pulse-2"></div>
+      <div class="pulse pulse-3"></div>
+
+      <svg class="ring-svg" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <circle class="ring-track" cx="60" cy="60" r="52"/>
+        <circle class="ring-fill" cx="60" cy="60" r="52"/>
+      </svg>
+
+      <ion-icon name="checkbox" class="splash__icon"></ion-icon>
+    </div>
+
+    <!-- Title -->
+    <h1 class="splash__title">
+      <span class="word word-1">To Do</span>
+      <span class="word word-2">App</span>
+    </h1>
+
+    <!-- Tagline -->
+    <p class="splash__tagline">Organiza · Planifica · Avanza</p>
+
+    <!-- Version badge -->
+    <div class="splash__version">
+      <span class="version-dot"></span>
+      v1.0.0
+    </div>
+
+  </div>
+
+  <!-- Bottom loading bar -->
+  <div class="splash__bar">
+    <div class="splash__bar-fill"></div>
+  </div>
+
+  <!-- Corner decorators -->
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-br"></div>
+
+</div>

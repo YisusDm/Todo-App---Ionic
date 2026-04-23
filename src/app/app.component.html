@@ -1,4 +1,9 @@
 <ion-app>
+  <!-- Splash screen on cold start -->
+  @if (showSplash) {
+    <app-splash-screen [isExiting]="splashExiting"></app-splash-screen>
+  }
+
   <!-- Global app bar -->
   <div class="app-bar">
     <span class="app-bar-title">To Do App</span>
