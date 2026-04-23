@@ -1,3 +1,8 @@
+// Gives clearance so the last category isn't hidden behind the FAB
+ion-content {
+  --padding-bottom: 80px;
+}
+
 // ── Toolbar ───────────────────────────────────────────────────────────────────
 .main-toolbar {
   --background: var(--app-primary-grad);
