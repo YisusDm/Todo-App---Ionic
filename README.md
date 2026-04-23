@@ -12,24 +12,114 @@ Aplicación móvil híbrida de gestión de tareas construida con Ionic 8 + Angul
 
 ---
 
+## ⬇️ Descargas
+
+| Plataforma | Archivo | Tamaño |
+|---|---|---|
+| 🌐 **Web** (build producción) | [Todo-App-web.zip](https://github.com/YisusDm/todo-app/releases/download/v1.0.0/Todo-App-web.zip) | 1.67 MB |
+| 🤖 **Android** APK | [Todo-App.apk](https://github.com/YisusDm/todo-app/releases/download/v1.0.0/Todo-App.apk) | 4.74 MB |
+| 🍎 **iOS** IPA | — | Requiere macOS + Xcode — ver [instrucciones](#ios) |
+
+> Todos los artefactos están en la página de [**Releases → v1.0.0**](https://github.com/YisusDm/todo-app/releases/tag/v1.0.0)
+
+---
+
+### 📲 Cómo descargar e instalar
+
+#### Android — instalar el APK
+
+1. Haz clic en **[Todo-App.apk](https://github.com/YisusDm/todo-app/releases/download/v1.0.0/Todo-App.apk)** — se descarga directamente desde GitHub Releases
+2. Transfiere el `.apk` al dispositivo Android (USB, Drive, WhatsApp, etc.)
+3. En el dispositivo: abre el archivo desde el **Gestor de archivos**
+4. Si aparece el aviso *"Instalar apps de fuentes desconocidas"* → **Configuración → Seguridad → Permitir esta fuente**
+5. Pulsa **Instalar** → la app aparece en el launcher como **To Do App**
+
+```bash
+# Alternativa con adb (dispositivo conectado por USB con Depuración USB activada)
+adb install Todo-App.apk
+```
+
+#### 🌐 Web — desplegar el build de producción
+
+1. Descarga **[Todo-App-web.zip](https://github.com/YisusDm/todo-app/releases/download/v1.0.0/Todo-App-web.zip)**
+2. Descomprime — obtienes la carpeta `www/` con el bundle de Angular compilado
+3. Sirve la carpeta con cualquier servidor estático:
+
+```bash
+# Con npx serve (sin instalación global)
+npx serve www
+
+# Con Python
+python -m http.server 8080 --directory www
+
+# O sube la carpeta directamente a Firebase Hosting, Netlify o Vercel
+```
+
+#### 🍎 iOS — generar el IPA (requiere macOS)
+
+1. Clona el repositorio en un Mac con Xcode instalado
+2. Ejecuta el build web y sync:
+```bash
+ionic build --prod
+npx cap sync ios
+npx cap open ios        # abre Xcode automáticamente
+```
+3. En Xcode: selecciona un dispositivo o simulador → **Product → Archive**
+4. En el Organizer: **Distribute App → Ad Hoc** → exporta el `.ipa`
+
+---
+
+### 🏷️ Cómo se generó este release
+
+El release `v1.0.0` se creó con los siguientes pasos:
+
+**1. Build de producción web:**
+```bash
+ionic build --prod
+# Output: carpeta www/ (bundle Angular + assets)
+```
+
+**2. Sync y build Android release:**
+```bash
+npx cap sync android
+cd android && ./gradlew assembleRelease
+# Output: android/app/build/outputs/apk/release/app-release.apk
+```
+El APK está firmado con un keystore RSA 2048-bit generado con `keytool` (JDK de Android Studio). El keystore **no se incluye en el repositorio** (`.gitignore`).
+
+**3. Preparar artefactos:**
+```bash
+# Renombrar APK
+cp android/app/build/outputs/apk/release/app-release.apk release-artifacts/Todo-App.apk
+
+# Comprimir build web
+Compress-Archive -Path 'www/*' -DestinationPath 'release-artifacts/Todo-App-web.zip'
+```
+
+**4. Publicar en GitHub Releases:**
+Desde GitHub → pestaña **Releases** → **Draft a new release** → tag `v1.0.0` → subir los dos archivos como assets → **Publish release**.
+
+---
+
 ## Tabla de contenido
 
-1. [Descripción](#descripción)
-2. [Stack tecnológico](#stack-tecnológico)
-3. [Aspectos relevantes del stack](#aspectos-relevantes-del-stack)
+1. [Descargas](#️-descargas)
+2. [Descripción](#descripción)
+3. [Stack tecnológico](#stack-tecnológico)
+4. [Aspectos relevantes del stack](#aspectos-relevantes-del-stack)
    - [Capacitor en lugar de Cordova](#capacitor-en-lugar-de-cordova)
    - [SQLite via WebAssembly](#sqlite-via-webassembly-sqljs)
    - [Firebase Remote Config](#firebase-remote-config)
    - [Gestión de estado reactiva](#gestión-de-estado-reactiva-facade--rxjs)
    - [Lazy loading de tareas](#lazy-loading-de-tareas-con-paginación-reactiva)
-4. [Arquitectura](#arquitectura)
-5. [Decisiones arquitectónicas clave](#decisiones-arquitectónicas-clave)
-6. [Esquema de datos](#esquema-de-datos)
-7. [Instalación y configuración](#instalación-y-configuración)
-8. [Ejecución y compilación](#ejecución-y-compilación)
-9. [Estructura del proyecto](#estructura-del-proyecto)
-10. [Control de versiones](#control-de-versiones)
-11. [Desafíos técnicos](#desafíos-técnicos)
+5. [Arquitectura](#arquitectura)
+6. [Decisiones arquitectónicas clave](#decisiones-arquitectónicas-clave)
+7. [Esquema de datos](#esquema-de-datos)
+8. [Instalación y configuración](#instalación-y-configuración)
+9. [Ejecución y compilación](#ejecución-y-compilación)
+10. [Estructura del proyecto](#estructura-del-proyecto)
+11. [Control de versiones](#control-de-versiones)
+12. [Desafíos técnicos](#desafíos-técnicos)
 
 ---
 

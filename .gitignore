@@ -80,3 +80,11 @@ Thumbs.db
 src/environments/environment.prod.ts
 google-services.json
 GoogleService-Info.plist
+
+# Android signing — never commit keystores
+*.keystore
+*.jks
+keystore.properties
+
+# Release artifacts — se suben a GitHub Releases, no al repo
+/release-artifacts
