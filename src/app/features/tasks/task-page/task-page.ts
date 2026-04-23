@@ -12,6 +12,7 @@ import {
   ModalController,
   AlertController,
   RefresherCustomEvent,
+  InfiniteScrollCustomEvent,
   IonItemSliding,
 } from '@ionic/angular';
 import { ItemReorderEventDetail } from '@ionic/core';
@@ -141,6 +142,11 @@ export class TaskPageComponent implements OnInit, OnDestroy {
       ],
     });
     await alert.present();
+  }
+
+  async loadMore(event: InfiniteScrollCustomEvent): Promise<void> {
+    this.tasksFacade.loadNextPage();
+    await event.target.complete();
   }
 
   async handleRefresh(event: RefresherCustomEvent): Promise<void> {

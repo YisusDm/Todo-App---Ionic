@@ -111,7 +111,7 @@
 
         <ion-item-sliding
           #slidingItem
-          *ngFor="let vm of tasksFacade.filteredTasksVm$ | async; trackBy: trackByVmId"
+          *ngFor="let vm of tasksFacade.displayedTasksVm$ | async; trackBy: trackByVmId"
           class="task-slide">
 
           <ion-item-options side="start">
@@ -208,6 +208,16 @@
         </ion-item-sliding>
       </ion-reorder-group>
     </ion-list>
+
+    <ion-infinite-scroll
+      threshold="150px"
+      [disabled]="!(tasksFacade.hasMore$ | async)"
+      (ionInfinite)="loadMore($event)">
+      <ion-infinite-scroll-content
+        loadingSpinner="crescent"
+        loadingText="Cargando más tareas...">
+      </ion-infinite-scroll-content>
+    </ion-infinite-scroll>
   </div>
 
   <ion-fab slot="fixed" vertical="bottom" horizontal="end">

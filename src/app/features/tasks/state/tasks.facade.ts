@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ItemReorderEventDetail } from '@ionic/core';
-import { combineLatest, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, combineLatest, merge, Observable, Subject } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
@@ -69,6 +69,8 @@ export class TasksFacade {
 
   private readonly filterSubject = new Subject<TaskFilter>();
   private readonly categorySubject = new Subject<string | null>();
+  private readonly pageSubject = new BehaviorSubject<number>(1);
+  private readonly PAGE_SIZE = 20;
 
   readonly tasks$: Observable<Task[]>;
   readonly categories$: Observable<Category[]>;
@@ -77,6 +79,8 @@ export class TasksFacade {
   readonly stats$: Observable<{ total: number; completed: number; pending: number; completionPercentage: number }>;
   readonly filteredTasks$: Observable<Task[]>;
   readonly filteredTasksVm$: Observable<TaskViewModel[]>;
+  readonly displayedTasksVm$: Observable<TaskViewModel[]>;
+  readonly hasMore$: Observable<boolean>;
 
   constructor(
     @Inject(TASKS_REPOSITORY) private readonly tasksRepo: ITasksRepository,
@@ -123,6 +127,32 @@ export class TasksFacade {
         tasks.map(task => buildTaskViewModel(task, categories))
       )
     );
+
+    // Reset to page 1 whenever any filter/search input changes
+    merge(
+      this.filterSubject,
+      this.categorySubject,
+      this.searchControl.valueChanges.pipe(debounceTime(300), distinctUntilChanged())
+    ).subscribe(() => this.pageSubject.next(1));
+
+    this.displayedTasksVm$ = combineLatest([
+      this.filteredTasksVm$,
+      this.pageSubject.asObservable(),
+    ]).pipe(
+      map(([vms, page]) => vms.slice(0, page * this.PAGE_SIZE))
+    );
+
+    this.hasMore$ = combineLatest([
+      this.filteredTasksVm$,
+      this.pageSubject.asObservable(),
+    ]).pipe(
+      map(([vms, page]) => vms.length > page * this.PAGE_SIZE),
+      distinctUntilChanged()
+    );
+  }
+
+  loadNextPage(): void {
+    this.pageSubject.next(this.pageSubject.getValue() + 1);
   }
 
   getCategoriesForTaskForm(): Category[] {
