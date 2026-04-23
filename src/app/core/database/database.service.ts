@@ -39,7 +39,7 @@ export class DatabaseService {
     if (this.initialized) return;
 
     const SQL: SqlJsStatic = await initSqlJs({
-      locateFile: (file: string) => `assets/sql.js/${file}`,
+      locateFile: () => `/assets/sql-wasm-browser.wasm`,
     });
 
     const saved = this.loadBinary();

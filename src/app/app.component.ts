@@ -7,6 +7,7 @@ import { ITasksRepository, TASKS_REPOSITORY } from './core/repositories/tasks.re
 import { ICategoriesRepository, CATEGORIES_REPOSITORY } from './core/repositories/categories.repository';
 import { RemoteConfigService } from './core/services/remote-config.service';
 import { ThemeService } from './core/services/theme.service';
+import { MockDataService } from './core/services/mock-data.service';
 
 @Component({
   selector: 'app-root',
@@ -23,6 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
     @Inject(TASKS_REPOSITORY) private readonly tasksRepo: ITasksRepository,
     @Inject(CATEGORIES_REPOSITORY) private readonly categoriesRepo: ICategoriesRepository,
     private readonly remoteConfigService: RemoteConfigService,
+    private readonly mockDataService: MockDataService,
     private readonly router: Router,
     private readonly platform: Platform,
     readonly themeService: ThemeService
@@ -40,6 +42,7 @@ export class AppComponent implements OnInit, OnDestroy {
     await this.categoriesRepo.init();
     await this.tasksRepo.init();
     await this.remoteConfigService.ensureInitialized();
+    await this.mockDataService.seedIfEmpty();
 
     this.resumeSub = this.platform.resume.subscribe(() => {
       void this.remoteConfigService.refresh();
